@@ -26,7 +26,7 @@ class SunCalc {
 
 	// lat and lng in radians
 	function calculate(moment, lat, lng) {
-		var d = moment.value() / DAYS - 0.5 + J1970 - J2000,
+		var d = moment.value().toDouble() / DAYS - 0.5 + J1970 - J2000,
 			n = Math.round(d - J0 + lng / PI2),
 			ds = J0 - lng / PI2 + n,
 			M = 6.240059967 + 0.01720197 * ds,
