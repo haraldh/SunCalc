@@ -29,14 +29,13 @@ class SunCalc {
 		var d = moment.value() / DAYS - 0.5 + J1970 - J2000,
 			n = Math.round(d - J0 + lng / PI2),
 			ds = J0 - lng / PI2 + n,
-			M = 6.240059967 + 0.01720197 * ds,
+			M = RAD * (357.5291 + 0.98560028 * ds),
 			sinM = Math.sin(M),
 			C = (1.9148 * sinM + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M)) * RAD,
-			L = M + C + 1.796593063 + PI,
+			L = M + C + RAD * 102.9372 + PI,
 			sin2L = Math.sin(2 * L),
 			dec = Math.asin( 0.00714008 * Math.sin(L) ),
 			Jnoon = J2000 + ds + 0.0053 * sinM - 0.0069 * sin2L;
-
 
 		var result = {
 			"solarNoon" => fromJulian(Jnoon),
