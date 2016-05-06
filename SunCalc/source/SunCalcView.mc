@@ -31,8 +31,7 @@ class SunCalcView extends Ui.View {
     		var moment = result[keys[i]];
     		if (moment != null) {
 	    		var tinfo = Time.Gregorian.info(moment, Time.FORMAT_SHORT);
-    			System.println(keys[i]);
-    			System.println(tinfo.year + "." + tinfo.month + "." + tinfo.day + " " + tinfo.hour + ":" + tinfo.min + ":" + tinfo.sec);
+    			System.println(keys[i] + ": " + tinfo.year + "." + tinfo.month + "." + tinfo.day + " " + tinfo.hour + ":" + tinfo.min + ":" + tinfo.sec);
     		}
     	}
     }

@@ -27,8 +27,8 @@ class SunCalc {
 	// lat and lng in radians
 	function calculate(moment, lat, lng) {
 		var d = moment.value() / DAYS - 0.5 + J1970 - J2000,
-			n = Math.round(d - J0 - lng / PI2),
-			ds = J0 + lng / PI2 + n,
+			n = Math.round(d - J0 + lng / PI2),
+			ds = J0 - lng / PI2 + n,
 			M = 6.240059967 + 0.01720197 * ds,
 			sinM = Math.sin(M),
 			C = (1.9148 * sinM + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M)) * RAD,
@@ -48,7 +48,7 @@ class SunCalc {
 			var x = (Math.sin(time[0]) - Math.sin(lat) * Math.sin(dec)) / (Math.cos(lat) * Math.cos(dec));
 
 			if (x <= 1.0 && x >= -1.0) {
-				var ds = J0 + (Math.acos(x) + lng) / PI2 + n;
+				var ds = J0 + (Math.acos(x) - lng) / PI2 + n;
 				var Jset = J2000 + ds + 0.0053 * sinM - 0.0069 * sin2L;
 				var Jrise = Jnoon - (Jset - Jnoon);
 				result[time[1]] = fromJulian(Jrise);
