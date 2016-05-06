@@ -34,7 +34,7 @@ class SunCalc {
 			C = (1.9148 * sinM + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M)) * RAD,
 			L = M + C + 1.796593063 + PI,
 			sin2L = Math.sin(2 * L),
-			dec = Math.asin( 0.00714008 * Math.sin(L) ),
+			dec = Math.asin( 0.397783703 * Math.sin(L) ),
 			Jnoon = J2000 + ds + 0.0053 * sinM - 0.0069 * sin2L;
 
 
