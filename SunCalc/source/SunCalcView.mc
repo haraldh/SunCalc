@@ -22,6 +22,9 @@ class SunCalcView extends Ui.View {
     //! loading resources into memory.
     function onShow() {
     	var info = Position.getInfo();
+    	if (info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+    		return;
+    	}
     	var loc = info.position.toRadians();
     	System.println(loc[0] + ", " + loc[1]);
     	sc = new SunCalc();
@@ -32,6 +35,9 @@ class SunCalcView extends Ui.View {
     }
 
 	function setPosition(info) {
+    	if (info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+    		return;
+    	}
     	var loc = info.position.toRadians();
     	System.println(loc[0] + ", " + loc[1]);
     	var now = info.when;
