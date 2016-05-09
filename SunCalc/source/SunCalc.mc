@@ -12,22 +12,30 @@ class SunCalc {
 		J0 = 0.0009;
 
 	hidden const TIMES = [
-		[-0.833 * RAD, "sunrise",       "sunset"      ],
-		[  -0.3 * RAD, "sunriseEnd",    "sunsetStart" ],
-		[    -6 * RAD, "dawn",          "dusk"        ],
-		[   -12 * RAD, "nauticalDawn",  "nauticalDusk"],
-		[   -18 * RAD, "nightEnd",      "night"       ],
-		[     6 * RAD, "goldenHourEnd", "goldenHour"  ]
+		[-0.833 * RAD, "Sunrise",       "Sunset"      ],
+		[  -0.3 * RAD, "Sunrise End",    "Sunset Start" ],
+		[    -6 * RAD, "Dawn",          "Dusk"        ],
+		[   -12 * RAD, "Nautical Dawn",  "Nautical Dusk"],
+		[   -18 * RAD, "Night End",      "Night"       ],
+		[     6 * RAD, "Golden Hour End", "Golden Hour"  ]
 		];
 
 	function fromJulian(j) {
 		return new Time.Moment((j + 0.5 - J1970) * DAYS);
 	}
+	
+	function round(a) {
+		if (a > 0) {
+			return (a + 0.5).toNumber().toFloat();
+		} else {
+			return (a - 0.5).toNumber().toFloat();
+		}
+	}
 
 	// lat and lng in radians
 	function calculate(moment, lat, lng) {
 		var d = moment.value().toDouble() / DAYS - 0.5 + J1970 - J2000,
-			n = Math.round(d - J0 + lng / PI2),
+			n = round(d - J0 + lng / PI2),
 			ds = J0 - lng / PI2 + n,
 			M = 6.240059967 + 0.01720197 * ds,
 			sinM = Math.sin(M),
@@ -36,7 +44,6 @@ class SunCalc {
 			sin2L = Math.sin(2 * L),
 			dec = Math.asin( 0.397783703 * Math.sin(L) ),
 			Jnoon = J2000 + ds + 0.0053 * sinM - 0.0069 * sin2L;
-
 
 		var result = {
 			"solarNoon" => fromJulian(Jnoon),

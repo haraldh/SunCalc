@@ -19,13 +19,15 @@ class SunCalcApp extends App.AppBase {
     }
 
     function onPosition(info) {
-        view.setPosition(info);
+    	if (view) {
+        	view.setPosition(info);
+        }
     }
 
     //! Return the initial view of your application here
     function getInitialView() {
     	view = new SunCalcView();
-        return [ view ];
+        return [ view, new SunCalcDelegate(view, false) ];
     }
 
 }

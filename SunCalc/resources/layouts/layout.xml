@@ -1,3 +1,2 @@
 <layout id="MainLayout">
-    <bitmap id="id_monkey" x="center" y="center" filename="../drawables/monkey.png" />
 </layout>
