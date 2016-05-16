@@ -2,10 +2,6 @@
     <iq:application entry="SunCalcApp" id="75001020F6B24591B5394BD7678F907E" launcherIcon="@Drawables.LauncherIcon" name="@Strings.AppName" type="widget">
 
         <iq:products>
-            <iq:product id="square_watch"/>
-            <iq:product id="tall_watch"/>
-            <iq:product id="round_watch"/>
-            <iq:product id="semi_round_watch"/>
             <iq:product id="fr235"/>
             <iq:product id="fenix3"/>
         </iq:products>
