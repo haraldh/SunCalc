@@ -2,7 +2,6 @@
     <iq:application entry="SunCalcApp" id="75001020F6B24591B5394BD7678F907E" launcherIcon="@Drawables.LauncherIcon" name="@Strings.AppName" type="widget">
 
         <iq:products>
-            <iq:product id="fr630"/>
             <iq:product id="fr230"/>
             <iq:product id="fr235"/>
             <iq:product id="fenix3"/>
@@ -14,7 +13,6 @@
         </iq:permissions>
 
         <iq:languages>
-            <iq:language>deu</iq:language>
             <iq:language>eng</iq:language>
         </iq:languages>
 
