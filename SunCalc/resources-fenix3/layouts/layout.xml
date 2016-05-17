@@ -1,6 +1,8 @@
 <layout id="MainLayout">
-	<label id="up" text="" x="center" y="10" font="Gfx.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label id="what" x="center" y="80" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label id="time" x="center" y="110" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label id="down" text=">" x="center" y="185" font="Gfx.FONT_SMALL" color="Gfx.COLOR_WHITE" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<drawable id="white_background" />
+	<drawable id="gray_horizontal_up_bar" />
+	<drawable id="gray_horizontal_down_bar" />
+
+	<label id="what" x="center" y="70"  font="Gfx.FONT_LARGE" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<label id="time" x="center" y="115" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
 </layout>

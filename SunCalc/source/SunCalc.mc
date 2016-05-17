@@ -73,8 +73,9 @@ class SunCalc {
 		var d = moment.value().toDouble() / DAYS - 0.5 + J1970 - J2000;
 		if (lastD != d || lastLng != lng) {
 			n = round(d - J0 + lng / PI2);
-			ds = J0 - lng / PI2 + n;
-			M = 6.240059967 + 0.01720197 * ds;
+//			ds = J0 - lng / PI2 + n;
+			ds = J0 - lng / PI2 + n - 1.1574e-5 * 68;
+			M = 6.240059967 + 0.0172019715 * ds;
 			sinM = Math.sin(M);
 			C = (1.9148 * sinM + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M)) * RAD;
 			L = M + C + 1.796593063 + PI;
@@ -95,7 +96,7 @@ class SunCalc {
 			return null;
 		}
 
-		var ds = J0 + (Math.acos(x) - lng) / PI2 + n;
+		var ds = J0 + (Math.acos(x) - lng) / PI2 + n - 1.1574e-5 * 68;
 
 		var Jset = J2000 + ds + 0.0053 * sinM - 0.0069 * sin2L;
 		if (what > NOON) {

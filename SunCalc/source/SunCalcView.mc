@@ -57,20 +57,7 @@ class SunCalcView extends Ui.View {
     		return;
     	}
     	setPosition(info);
-
-		display_index = 6; // NOON
 		    	
-    	var moment = getMoment(display[display_index][2]);
-		if (moment.value() > now.value()) {
-			display_index = 0;
-		}
-
-    	while(moment.value() < now.value()) {
-    		displayNext();
-    		moment = getMoment(display[display_index][2]);
-		}
-
-        myUpdate();
         return View.onShow();
     }
 
@@ -82,8 +69,27 @@ class SunCalcView extends Ui.View {
     	}
 
     	var loc = info.position.toRadians();
-		DAY_IN_ADVANCE = 0;
 		self.lastLoc = loc;
+
+		if (listview == 0) {
+			DAY_IN_ADVANCE = 0;
+			display_index = 6; // NOON
+	    	var moment = getMoment(display[display_index][2]);
+			if (moment.value() > now.value()) {
+				display_index = 0;
+		   		moment = getMoment(display[display_index][1]);
+		   		if (moment.value() > now.value()) {
+		    		displayPrevious();
+		   		}
+			}
+	   		moment = getMoment(display[display_index][2]);
+
+	    	while(moment.value() < now.value()) {
+    			displayNext();
+    			moment = getMoment(display[display_index][2]);
+			}
+		}
+
         myUpdate();
 	}
 
@@ -94,7 +100,6 @@ class SunCalcView extends Ui.View {
 			DAY_IN_ADVANCE--;
 			display_index = display.size() - 1;
 		}
-        myUpdate();
 	}
 
 	function displayNext()
@@ -104,7 +109,6 @@ class SunCalcView extends Ui.View {
 			DAY_IN_ADVANCE++;
 			display_index = 0;
 		}
-        myUpdate();
 	}
 
 	function waitingForGPS() {
@@ -134,30 +138,30 @@ class SunCalcView extends Ui.View {
 	    return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc[0], lastLoc[1], what);
 	}
 
+	function onUpdate(dc) {
+		Ui.View.onUpdate(dc);
+
+		if (listview) {
+		    var arrow = new Rez.Drawables.Arrow_updown();
+		    arrow.draw(dc);
+		} else {
+		    var arrow = new Rez.Drawables.Arrow_right();
+		    arrow.draw(dc);
+		}
+	}
+
     //! Update the view
     function myUpdate() {
     	var text;
-		//dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
 
 		if (lastLoc == null) {
 			findDrawableById("what").setText("Waiting for GPS");
-			//dc.drawText(dc.getWidth()/2, dc.getHeight()*1/3, Gfx.FONT_MEDIUM, "Waiting for GPS", Gfx.TEXT_JUSTIFY_CENTER); 
+			findDrawableById("time").setText("");
+			Ui.requestUpdate();
 			return;
-		}
-
-		if (listview) {
-			findDrawableById("up").setText("^");
-			findDrawableById("down").setText("v");
-			//dc.drawText(dc.getWidth()/2, dc.getHeight()*1/7, Gfx.FONT_MEDIUM, "^", Gfx.TEXT_JUSTIFY_CENTER); 
-			//dc.drawText(dc.getWidth()/2, dc.getHeight()*6/7, Gfx.FONT_MEDIUM, "v", Gfx.TEXT_JUSTIFY_CENTER); 			
-		} else {
-			findDrawableById("up").setText(">");
-			findDrawableById("down").setText(">");
-			//dc.drawText(dc.getWidth()/2, dc.getHeight()*6/7, Gfx.FONT_MEDIUM, "->", Gfx.TEXT_JUSTIFY_CENTER); 
 		}
 		
 		findDrawableById("what").setText(display[display_index][0]);
-		//dc.drawText(dc.getWidth()/2, dc.getHeight()*2/7, Gfx.FONT_MEDIUM, display[display_index][0], Gfx.TEXT_JUSTIFY_CENTER); 
 
     	var moment = getMoment(display[display_index][1]);
     	if (moment) {
@@ -171,9 +175,8 @@ class SunCalcView extends Ui.View {
 
 			System.println(text);
 		} else {
-			text = "--";
+			text = "----";
 		}
-		//dc.drawText(dc.getWidth()/2, dc.getHeight()*4/7, Gfx.FONT_MEDIUM, text, Gfx.TEXT_JUSTIFY_CENTER); 
 		findDrawableById("time").setText(text);
 		Ui.requestUpdate();
     }
@@ -223,6 +226,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
     		return false;
     	}
 		view.displayPrevious();
+		view.myUpdate();
 		return true;
 	}
 
@@ -232,6 +236,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
     	}
 
 		view.displayNext();
+		view.myUpdate();
 		return true;
 	}
 
@@ -240,6 +245,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
     		return false;
     	}
 		view.displayPrevious();
+		view.myUpdate();
 		return true;
 	}
 
@@ -248,6 +254,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
     		return false;
     	}
 		view.displayNext();
+		view.myUpdate();
 		return true;
 	}
 
