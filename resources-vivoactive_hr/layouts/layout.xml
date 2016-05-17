@@ -1,0 +1,8 @@
+<layout id="MainLayout">
+	<drawable id="white_background" />
+	<drawable id="gray_horizontal_up_bar" />
+	<drawable id="gray_horizontal_down_bar" />
+
+	<label id="what" x="center" y="60"  font="Gfx.FONT_LARGE" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<label id="time" x="center" y="105" font="Gfx.FONT_SMALL" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+</layout>

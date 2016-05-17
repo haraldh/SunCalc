@@ -9,11 +9,12 @@ class SunCalcView extends Ui.View {
 	var sc;
 	var listview;
 	var now;
-	var DAY_IN_ADVANCE = 0;
+	var DAY_IN_ADVANCE;
 	var lastLoc;
+	var halfheight;
 	
 	const display = [
-		[ "Astronomical Dawn", NIGHT_END, NAUTICAL_DAWN ],
+		[ "Astr. Dawn", NIGHT_END, NAUTICAL_DAWN ],
 		[ "Nautical Dawn", NAUTICAL_DAWN, DAWN ],
 		[ "Blue Hour", DAWN, BLUE_HOUR_AM ],
 		[ "Civil Dawn", DAWN, SUNRISE ],
@@ -26,7 +27,7 @@ class SunCalcView extends Ui.View {
 		[ "Civil Dusk", SUNSET, DUSK ],
 		[ "Blue Hour", BLUE_HOUR_PM, DUSK ],
 		[ "Nautical Dusk", DUSK, NAUTICAL_DUSK ],
-		[ "Astronomical Dusk", NAUTICAL_DUSK, NIGHT ],
+		[ "Astr. Dusk", NAUTICAL_DUSK, NIGHT ],
 		[ "Night", NIGHT, NIGHT+1 ]
 		];
 
@@ -40,12 +41,14 @@ class SunCalcView extends Ui.View {
 		DAY_IN_ADVANCE = 0;
 		lastLoc = null;
 		display_index = 0;
+		halfheight = null;
     }
 
     //! Load your resources here
     function onLayout(dc) {
         setLayout(Rez.Layouts.MainLayout(dc));
 		findDrawableById("what").setText("Waiting for GPS");
+		halfheight = dc.getHeight() / 2;
     }
 	
     //! Called when this View is brought to the foreground. Restore
@@ -266,5 +269,22 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 
 		return BehaviorDelegate.onBack();
 //		Sys.exit();
+	}
+
+	function onTap(event) {
+		if (view.halfheight == null) {
+			return BehaviorDelegate.onTap(event);
+		}
+		
+		var coordinate = event.getCoordinates();
+		var event_x = coordinate[0];
+		var event_y = coordinate[1];
+		if (event_y > view.halfheight) {
+			onNextPage();
+			return true;
+		} else {
+			onPreviousPage();
+			return true;
+		}
 	}
 }

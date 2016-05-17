@@ -1,21 +1,21 @@
 <drawables>
 		<drawable-list id="Arrow_updown">
-			<shape type="polygon" points="[[109,5], [98,15], [120,15]]" color="Gfx.COLOR_BLACK" />
-			<shape type="polygon" points="[[109,175], [98,165], [120,165]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[74,5], [63,15], [85,15]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[74,200], [63,190], [85,190]]" color="Gfx.COLOR_BLACK" />
 		</drawable-list>
 		<drawable-list id="Arrow_right">
-			<shape type="polygon" points="[[104,10], [104,30], [114,20]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[91,20], [91,40], [101,30]]" color="Gfx.COLOR_BLACK" />
 		</drawable-list>
 
 	    <drawable-list id="gray_horizontal_up_bar">
-	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="40" width="fill" height="2" />
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="50" width="fill" height="2" />
 	    </drawable-list>
 	    <drawable-list id="gray_horizontal_down_bar">
-	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="140" width="fill" height="2" />
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="150" width="fill" height="2" />
 	    </drawable-list>
 	    <drawable-list id="white_background">
 	        <shape type="rectangle" color="Gfx.COLOR_WHITE" x="0" y="0" width="fill" height="fill" />
 	    </drawable-list>
-
+	    
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
 </drawables>
