@@ -2,9 +2,11 @@
     <iq:application entry="SunCalcApp" id="75001020F6B24591B5394BD7678F907E" launcherIcon="@Drawables.LauncherIcon" name="@Strings.AppName" type="widget">
 
         <iq:products>
+            <iq:product id="fr630"/>
             <iq:product id="fr230"/>
             <iq:product id="fr235"/>
             <iq:product id="fenix3"/>
+            <iq:product id="fenix3_hr"/>
         </iq:products>
 
         <iq:permissions>
