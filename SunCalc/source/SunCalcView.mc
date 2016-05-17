@@ -62,7 +62,6 @@ class SunCalcView extends Ui.View {
     }
 
 	function setPosition(info) {
-		System.println("setPosition()");
 		
     	if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
     		return;
@@ -165,7 +164,6 @@ class SunCalcView extends Ui.View {
 
     	var moment = getMoment(display[display_index][1]);
     	if (moment) {
-			System.println("Result for " + display[display_index][0]);
 			text = momentToString(moment);
 
 			moment = getMoment(display[display_index][2]);
@@ -173,7 +171,6 @@ class SunCalcView extends Ui.View {
 				text = text + " - " + momentToString(moment);
 			}
 
-			System.println(text);
 		} else {
 			text = "----";
 		}
