@@ -73,6 +73,7 @@ class SunCalcView extends Ui.View {
 			return;
 		}
 
+		now = Time.now();
 		var loc = info.position.toRadians();
 		self.lastLoc = loc;
 
@@ -158,6 +159,7 @@ class SunCalcView extends Ui.View {
 			day++;
 			what = NIGHT_END;
 		}
+		now = Time.now();
 		return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc[0], lastLoc[1], what);
 	}
 
