@@ -3,6 +3,7 @@ using Toybox.Position as Position;
 using Toybox.Time as Time;
 using Toybox.Math as Math;
 using Toybox.Graphics as Gfx;
+using Toybox.System as Sys;
 
 class SunCalcView extends Ui.View {
 
@@ -12,6 +13,7 @@ class SunCalcView extends Ui.View {
 	var DAY_IN_ADVANCE;
 	var lastLoc;
 	var halfheight;
+	var is24Hour;
 
 	const display = [
 		[ "Astr. Dawn", NIGHT_END, NAUTICAL_DAWN ],
@@ -42,6 +44,7 @@ class SunCalcView extends Ui.View {
 		lastLoc = null;
 		display_index = 0;
 		halfheight = null;
+		is24Hour = Sys.getDeviceSettings().is24Hour();
 	}
 
 	//! Load your resources here
@@ -120,9 +123,26 @@ class SunCalcView extends Ui.View {
 
 	function momentToString(moment) {
    		var tinfo = Time.Gregorian.info(new Time.Moment(moment.value() + 30), Time.FORMAT_SHORT);
-		var text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
+		var text;
+		if (is24Hour) {
+			text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
+		} else {
+			hour = tinfo.hour % 12;
+			if (hour == 0) {
+				hour = 12;
+			}
+			text = hour.format("%02d") + ":" + tinfo.min.format("%02d");
+			// wtf... get used to 24 hour format...
+			if (tinfo.hour < 12 || tinfo.hour == 24) {
+				text = text + " AM";
+			} else {
+				text = text + " PM";
+			};
+		}
+
 		var days = (moment.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber()
 			- (now.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber();
+
 		if (days > 0) {
 			text = text + " +" + days;
 		}
