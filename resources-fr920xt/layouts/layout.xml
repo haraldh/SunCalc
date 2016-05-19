@@ -3,6 +3,8 @@
 	<drawable id="gray_horizontal_up_bar" />
 	<drawable id="gray_horizontal_down_bar" />
 
-	<label id="what" x="center" y="40"  font="Gfx.FONT_LARGE" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label id="time" x="center" y="85" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<label id="what" x="center" y="36"  font="Gfx.FONT_LARGE" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<label id="time_from" x="center" y="65" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<label text="-"       x="center" y="81" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
+	<label id="time_to"   x="center" y="95" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
 </layout>

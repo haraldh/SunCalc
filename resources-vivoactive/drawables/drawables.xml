@@ -4,14 +4,14 @@
 			<shape type="polygon" points="[[102,143], [92,133], [114,133]]" color="Gfx.COLOR_BLACK" />
 		</drawable-list>
 		<drawable-list id="Arrow_right">
-			<shape type="polygon" points="[[98,10], [98,30], [108,20]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[96,4], [96,20], [110,12]]" color="Gfx.COLOR_BLACK" />
 		</drawable-list>
 
 	    <drawable-list id="gray_horizontal_up_bar">
-	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="35" width="fill" height="2" />
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="25" width="fill" height="2" />
 	    </drawable-list>
 	    <drawable-list id="gray_horizontal_down_bar">
-	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="115" width="fill" height="2" />
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="125" width="fill" height="2" />
 	    </drawable-list>
 	    <drawable-list id="white_background">
 	        <shape type="rectangle" color="Gfx.COLOR_WHITE" x="0" y="0" width="fill" height="fill" />

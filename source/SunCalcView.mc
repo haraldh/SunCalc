@@ -44,13 +44,15 @@ class SunCalcView extends Ui.View {
 		lastLoc = null;
 		display_index = 0;
 		halfheight = null;
-		is24Hour = Sys.getDeviceSettings().is24Hour();
+		is24Hour = Sys.getDeviceSettings().is24Hour;
 	}
 
 	//! Load your resources here
 	function onLayout(dc) {
 		setLayout(Rez.Layouts.MainLayout(dc));
 		findDrawableById("what").setText("Waiting for GPS");
+		findDrawableById("time_from").setText("");
+		findDrawableById("time_to").setText("");
 		halfheight = dc.getHeight() / 2;
 	}
 
@@ -123,12 +125,17 @@ class SunCalcView extends Ui.View {
 	}
 
 	function momentToString(moment) {
+	
+		if (moment == null) {
+			return "--:--";
+		}
+
    		var tinfo = Time.Gregorian.info(new Time.Moment(moment.value() + 30), Time.FORMAT_SHORT);
 		var text;
 		if (is24Hour) {
 			text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
 		} else {
-			hour = tinfo.hour % 12;
+			var hour = tinfo.hour % 12;
 			if (hour == 0) {
 				hour = 12;
 			}
@@ -181,26 +188,17 @@ class SunCalcView extends Ui.View {
 
 		if (lastLoc == null) {
 			findDrawableById("what").setText("Waiting for GPS");
-			findDrawableById("time").setText("");
+			findDrawableById("time_from").setText("");
+			findDrawableById("time_to").setText("");
 			Ui.requestUpdate();
 			return;
 		}
 
 		findDrawableById("what").setText(display[display_index][0]);
 
-		var moment = getMoment(display[display_index][1]);
-		if (moment) {
-			text = momentToString(moment);
+		findDrawableById("time_from").setText(momentToString(getMoment(display[display_index][1])));
+		findDrawableById("time_to").setText(momentToString(getMoment(display[display_index][2])));
 
-			moment = getMoment(display[display_index][2]);
-			if (moment) {
-				text = text + " - " + momentToString(moment);
-			}
-
-		} else {
-			text = "----";
-		}
-		findDrawableById("time").setText(text);
 		Ui.requestUpdate();
 	}
 
