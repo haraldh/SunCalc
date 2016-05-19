@@ -272,19 +272,23 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onTap(event) {
-		if (view.halfheight == null) {
-			return BehaviorDelegate.onTap(event);
-		}
-		
-		var coordinate = event.getCoordinates();
-		var event_x = coordinate[0];
-		var event_y = coordinate[1];
-		if (event_y > view.halfheight) {
-			onNextPage();
-			return true;
+		if (enter) {
+			if (view.halfheight == null) {
+				return BehaviorDelegate.onTap(event);
+			}
+
+			var coordinate = event.getCoordinates();
+			var event_x = coordinate[0];
+			var event_y = coordinate[1];
+			if (event_y > view.halfheight) {
+				onNextPage();
+			} else {
+				onPreviousPage();
+			}
 		} else {
-			onPreviousPage();
-			return true;
+			view.setListView(true);
+			Ui.pushView(view, new SunCalcDelegate(view, true), Ui.SLIDE_IMMEDIATE);
 		}
+		return true;
 	}
 }
