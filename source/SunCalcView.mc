@@ -12,7 +12,7 @@ class SunCalcView extends Ui.View {
 	var DAY_IN_ADVANCE;
 	var lastLoc;
 	var halfheight;
-	
+
 	const display = [
 		[ "Astr. Dawn", NIGHT_END, NAUTICAL_DAWN ],
 		[ "Nautical Dawn", NAUTICAL_DAWN, DAWN ],
@@ -33,66 +33,66 @@ class SunCalcView extends Ui.View {
 
 	var display_index;
 
-    function initialize() {
-        View.initialize();
-    	sc = new SunCalc();
-    	listview = false;
-    	now = Time.now();
+	function initialize() {
+		View.initialize();
+		sc = new SunCalc();
+		listview = false;
+		now = Time.now();
 		DAY_IN_ADVANCE = 0;
 		lastLoc = null;
 		display_index = 0;
 		halfheight = null;
-    }
+	}
 
-    //! Load your resources here
-    function onLayout(dc) {
-        setLayout(Rez.Layouts.MainLayout(dc));
+	//! Load your resources here
+	function onLayout(dc) {
+		setLayout(Rez.Layouts.MainLayout(dc));
 		findDrawableById("what").setText("Waiting for GPS");
 		halfheight = dc.getHeight() / 2;
-    }
-	
-    //! Called when this View is brought to the foreground. Restore
-    //! the state of this View and prepare it to be shown. This includes
-    //! loading resources into memory.
-    function onShow() {
-    	var info = Position.getInfo();
-    	if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-    		return;
-    	}
-    	setPosition(info);
-		    	
-        return View.onShow();
-    }
+	}
+
+	//! Called when this View is brought to the foreground. Restore
+	//! the state of this View and prepare it to be shown. This includes
+	//! loading resources into memory.
+	function onShow() {
+		var info = Position.getInfo();
+		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+			return;
+		}
+		setPosition(info);
+
+		return View.onShow();
+	}
 
 	function setPosition(info) {
-		
-    	if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-    		return;
-    	}
 
-    	var loc = info.position.toRadians();
+		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+			return;
+		}
+
+		var loc = info.position.toRadians();
 		self.lastLoc = loc;
 
 		if (listview == 0) {
 			DAY_IN_ADVANCE = 0;
 			display_index = 6; // NOON
-	    	var moment = getMoment(display[display_index][2]);
+			var moment = getMoment(display[display_index][2]);
 			if (moment.value() > now.value()) {
 				display_index = 0;
 		   		moment = getMoment(display[display_index][1]);
 		   		if (moment.value() > now.value()) {
-		    		displayPrevious();
+					displayPrevious();
 		   		}
 			}
 	   		moment = getMoment(display[display_index][2]);
 
-	    	while(moment.value() < now.value()) {
-    			displayNext();
-    			moment = getMoment(display[display_index][2]);
+			while(moment.value() < now.value()) {
+				displayNext();
+				moment = getMoment(display[display_index][2]);
 			}
 		}
 
-        myUpdate();
+		myUpdate();
 	}
 
 	function displayPrevious()
@@ -115,13 +115,14 @@ class SunCalcView extends Ui.View {
 
 	function waitingForGPS() {
 		self.lastLoc = null;
-        myUpdate();
+		myUpdate();
 	}
 
 	function momentToString(moment) {
    		var tinfo = Time.Gregorian.info(new Time.Moment(moment.value() + 30), Time.FORMAT_SHORT);
 		var text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
-		var days = (moment.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber() - (now.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber();
+		var days = (moment.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber()
+			- (now.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber();
 		if (days > 0) {
 			text = text + " +" + days;
 		}
@@ -137,24 +138,24 @@ class SunCalcView extends Ui.View {
 			day++;
 			what = NIGHT_END;
 		}
-	    return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc[0], lastLoc[1], what);
+		return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc[0], lastLoc[1], what);
 	}
 
 	function onUpdate(dc) {
 		Ui.View.onUpdate(dc);
 
 		if (listview) {
-		    var arrow = new Rez.Drawables.Arrow_updown();
-		    arrow.draw(dc);
+			var arrow = new Rez.Drawables.Arrow_updown();
+			arrow.draw(dc);
 		} else {
-		    var arrow = new Rez.Drawables.Arrow_right();
-		    arrow.draw(dc);
+			var arrow = new Rez.Drawables.Arrow_right();
+			arrow.draw(dc);
 		}
 	}
 
-    //! Update the view
-    function myUpdate() {
-    	var text;
+	//! Update the view
+	function myUpdate() {
+		var text;
 
 		if (lastLoc == null) {
 			findDrawableById("what").setText("Waiting for GPS");
@@ -162,11 +163,11 @@ class SunCalcView extends Ui.View {
 			Ui.requestUpdate();
 			return;
 		}
-		
+
 		findDrawableById("what").setText(display[display_index][0]);
 
-    	var moment = getMoment(display[display_index][1]);
-    	if (moment) {
+		var moment = getMoment(display[display_index][1]);
+		if (moment) {
 			text = momentToString(moment);
 
 			moment = getMoment(display[display_index][2]);
@@ -179,33 +180,33 @@ class SunCalcView extends Ui.View {
 		}
 		findDrawableById("time").setText(text);
 		Ui.requestUpdate();
-    }
+	}
 
-    function setListView(b) {
-    	listview = b;
-    }
+	function setListView(b) {
+		listview = b;
+	}
 }
 
 class SunCalcDelegate extends Ui.BehaviorDelegate {
 	var view;
 	var enter;
-	
+
 	function initialize(v, e) {
 		BehaviorDelegate.initialize();
 		view = v;
 		enter = e;
-    	var info = Position.getInfo();
-    	if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-	        Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
-    	}
+		var info = Position.getInfo();
+		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+			Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
+		}
 	}
-	
+
 	function onKey(key) {
 		var k = key.getKey();
 		if (k == Ui.KEY_ENTER) {
-	    	if (enter) {
-		        view.waitingForGPS();
-		        Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
+			if (enter) {
+				view.waitingForGPS();
+				Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
 				return true;
 			} else {
 				view.setListView(true);
@@ -214,26 +215,26 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 		}
 		return BehaviorDelegate.onKey(key);
 	}
-	
-    function onPosition(info) {
-    	if (view) {
-        	view.setPosition(info);
-        }
-    }
+
+	function onPosition(info) {
+		if (view) {
+			view.setPosition(info);
+		}
+	}
 
 	function onPreviousPage() {
-    	if (!enter) {
-    		return false;
-    	}
+		if (!enter) {
+			return false;
+		}
 		view.displayPrevious();
 		view.myUpdate();
 		return true;
 	}
 
 	function onNextPage() {
-    	if (!enter) {
-    		return false;
-    	}
+		if (!enter) {
+			return false;
+		}
 
 		view.displayNext();
 		view.myUpdate();
@@ -241,34 +242,33 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 	}
 
 	function onPreviousMode() {
-    	if (!enter) {
-    		return false;
-    	}
+		if (!enter) {
+			return false;
+		}
 		view.displayPrevious();
 		view.myUpdate();
 		return true;
 	}
 
 	function onNextMode() {
-    	if (!enter) {
-    		return false;
-    	}
+		if (!enter) {
+			return false;
+		}
 		view.displayNext();
 		view.myUpdate();
 		return true;
 	}
 
 	function onBack() {
-        Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
+		Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
 
-    	if (enter) {
+		if (enter) {
 			view.setListView(false);
 			Ui.popView(Ui.SLIDE_IMMEDIATE);
-	        return true;
-    	}
+			return true;
+		}
 
 		return BehaviorDelegate.onBack();
-//		Sys.exit();
 	}
 
 	function onTap(event) {

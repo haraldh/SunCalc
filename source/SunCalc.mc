@@ -46,20 +46,20 @@ class SunCalc {
 		-6 * RAD,
 		-12 * RAD,
 		-18 * RAD
-	];
+		];
 
 	var lastD, lastLng;
 	var	n, ds, M, sinM, C, L, sin2L, dec, Jnoon;
-	
-    function initialize() {
-    	lastD = null;
-    	lastLng = null;
-    }
+
+	function initialize() {
+		lastD = null;
+		lastLng = null;
+	}
 
 	function fromJulian(j) {
 		return new Time.Moment((j + 0.5 - J1970) * DAYS);
 	}
-	
+
 	function round(a) {
 		if (a > 0) {
 			return (a + 0.5).toNumber().toFloat();
@@ -85,7 +85,7 @@ class SunCalc {
 			lastD = d;
 			lastLng = lng;
 		}
-		
+
 		if (what == NOON) {
 			return fromJulian(Jnoon);
 		}
