@@ -12,7 +12,7 @@ class SunCalcView extends Ui.View {
 	var now;
 	var DAY_IN_ADVANCE;
 	var lastLoc;
-	var halfheight;
+	var thirdHeight;
 	var is24Hour;
 
 	const display = [
@@ -43,7 +43,7 @@ class SunCalcView extends Ui.View {
 		DAY_IN_ADVANCE = 0;
 		lastLoc = null;
 		display_index = 0;
-		halfheight = null;
+		thirdHeight = null;
 		is24Hour = Sys.getDeviceSettings().is24Hour;
 	}
 
@@ -53,7 +53,7 @@ class SunCalcView extends Ui.View {
 		findDrawableById("what").setText("Waiting for GPS");
 		findDrawableById("time_from").setText("");
 		findDrawableById("time_to").setText("");
-		halfheight = dc.getHeight() / 2;
+		thirdHeight = dc.getHeight() / 3;
 	}
 
 	//! Called when this View is brought to the foreground. Restore
@@ -294,17 +294,20 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 
 	function onTap(event) {
 		if (enter) {
-			if (view.halfheight == null) {
+			if (view.thirdHeight == null) {
 				return BehaviorDelegate.onTap(event);
 			}
 
 			var coordinate = event.getCoordinates();
 			var event_x = coordinate[0];
 			var event_y = coordinate[1];
-			if (event_y > view.halfheight) {
+			if (event_y <= view.thirdHeight) {
 				onNextPage();
-			} else {
+			} else if (event_y >= (view.thirdHeight * 2)) {
 				onPreviousPage();
+			} else {
+				view.waitingForGPS();
+				Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
 			}
 		} else {
 			view.setListView(true);
