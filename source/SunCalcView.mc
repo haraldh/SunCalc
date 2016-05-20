@@ -60,11 +60,11 @@ class SunCalcView extends Ui.View {
 	//! the state of this View and prepare it to be shown. This includes
 	//! loading resources into memory.
 	function onShow() {
-		var info = Position.getInfo();
-		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-			return;
-		}
-		setPosition(info);
+		//var info = Position.getInfo();
+		//if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+		//	return;
+		//}
+		//setPosition(info);
 
 		return View.onShow();
 	}
@@ -125,8 +125,8 @@ class SunCalcView extends Ui.View {
 	}
 
 	function momentToString(moment) {
-	
-		if (moment == null) {
+
+		if (!moment) {
 			return "--:--";
 		}
 
