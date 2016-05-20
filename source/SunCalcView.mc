@@ -224,9 +224,9 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 	function onKey(key) {
 		var k = key.getKey();
 		if (k == Ui.KEY_ENTER || k == Ui.KEY_START || k == Ui.KEY_RIGHT) {
-	    	if (enter) {
-		        view.waitingForGPS();
-		        Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
+			if (enter) {
+				view.waitingForGPS();
+				Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
 				return true;
 			} else {
 				view.setListView(true);
