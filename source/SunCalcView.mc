@@ -8,7 +8,7 @@ using Toybox.System as Sys;
 class SunCalcView extends Ui.View {
 
 	var sc;
-	var listview;
+	var listView;
 	var now;
 	var DAY_IN_ADVANCE;
 	var lastLoc;
@@ -39,7 +39,7 @@ class SunCalcView extends Ui.View {
 	function initialize() {
 		View.initialize();
 		sc = new SunCalc();
-		listview = false;
+		listView = false;
 		now = Time.now();
 		DAY_IN_ADVANCE = 0;
 		lastLoc = null;
@@ -74,7 +74,7 @@ class SunCalcView extends Ui.View {
 		var loc = info.position.toRadians();
 		self.lastLoc = loc;
 
-		if (listview == 0) {
+		if (!listView) {
 			DAY_IN_ADVANCE = 0;
 			display_index = 6; // NOON
 			var moment = getMoment(display[display_index][2]);
@@ -168,7 +168,7 @@ class SunCalcView extends Ui.View {
 	function onUpdate(dc) {
 		Ui.View.onUpdate(dc);
 
-		if (listview) {
+		if (listView) {
 			var arrow = new Rez.Drawables.Arrow_updown();
 			arrow.draw(dc);
 		} else {
@@ -199,7 +199,7 @@ class SunCalcView extends Ui.View {
 	}
 
 	function setListView(b) {
-		listview = b;
+		listView = b;
 	}
 }
 
