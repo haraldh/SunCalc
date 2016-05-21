@@ -50,9 +50,9 @@ class SunCalcView extends Ui.View {
 	//! Load your resources here
 	function onLayout(dc) {
 		setLayout(Rez.Layouts.MainLayout(dc));
-		findDrawableById("what").setText("Waiting for GPS");
-		findDrawableById("time_from").setText("");
-		findDrawableById("time_to").setText("");
+		findDrawableById("what").setText("SunCalc");
+		findDrawableById("time_from").setText("Press");
+		findDrawableById("time_to").setText("Start");
 		thirdHeight = dc.getHeight() / 3;
 	}
 
@@ -126,7 +126,7 @@ class SunCalcView extends Ui.View {
 
 	function momentToString(moment) {
 
-		if (!moment) {
+		if (moment == null) {
 			return "--:--";
 		}
 
@@ -215,10 +215,6 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 		BehaviorDelegate.initialize();
 		view = v;
 		enter = e;
-		var info = Position.getInfo();
-		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-			Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
-		}
 	}
 
 	function onKey(key) {
@@ -230,6 +226,12 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 				return true;
 			} else {
 				view.setListView(true);
+				var info = Position.getInfo();
+				if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+					Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
+				}
+				view.setPosition(info);
+				view.myUpdate();
 				Ui.pushView(view, new SunCalcDelegate(view, true), Ui.SLIDE_IMMEDIATE);
 				return true;
 			}
