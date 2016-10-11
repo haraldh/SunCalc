@@ -2,8 +2,12 @@ using Toybox.Application as App;
 
 class SunCalcApp extends App.AppBase {
 
-	function initialize() {
-		AppBase.initialize();
+	function onStart() {
+		return false;
+	}
+
+	function onStop() {
+		return false;
 	}
 
 	//! Return the initial view of your application here

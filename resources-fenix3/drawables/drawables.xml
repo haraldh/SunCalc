@@ -4,7 +4,7 @@
 			<shape type="polygon" points="[[109,213], [98,203], [120,203]]" color="Gfx.COLOR_BLACK" />
 		</drawable-list>
 		<drawable-list id="Arrow_right">
-			<shape type="polygon" points="[[104,15], [104,35], [114,25]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[104,5], [104,25], [114,15]]" color="Gfx.COLOR_BLACK" />
 		</drawable-list>
 
 	    <drawable-list id="gray_horizontal_up_bar">

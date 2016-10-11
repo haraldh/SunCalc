@@ -53,15 +53,17 @@ class SunCalcView extends Ui.View {
 	function onLayout(dc) {
 		setLayout(Rez.Layouts.MainLayout(dc));
 		hasLayout = true;
+		thirdHeight = dc.getHeight() / 3;
 
-		if (lastLoc == null) {
+		var info = Position.getInfo();
+		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+			Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:setPosition));
 			findDrawableById("what").setText("Waiting for GPS");
 			findDrawableById("time_from").setText("");
 			findDrawableById("time_to").setText("");
 		} else {
-			myUpdate(); 
+			setPosition(info);
 		}
-		thirdHeight = dc.getHeight() / 3;
 	}
 
 	function setPosition(info) {
@@ -211,12 +213,6 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 		BehaviorDelegate.initialize();
 		view = v;
 		enter = e;
-		var info = Position.getInfo();
-		if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-			Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
-		} else {
-			view.setPosition(info);
-		}
 	}
 
 	function onKey(key) {
