@@ -142,14 +142,15 @@ class SunCalcView extends Ui.View {
 				text = text + " PM";
 			}
 		}
+		var today = Time.today();
+		var days = ((moment.value() - today.value()) / Time.Gregorian.SECONDS_PER_DAY).toNumber();
 
-		var days = (moment.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber()
-			- (now.value() / Time.Gregorian.SECONDS_PER_DAY).toNumber();
-
-		if (days > 0) {
-			text = text + " +" + days;
-		}
-		if (days < 0) {
+		if (moment.value() > today.value() ) {
+			if (days > 0) {
+				text = text + " +" + days;
+			}
+		} else {
+		    days = days - 1;
 			text = text + " " + days;
 		}
 		return text;
