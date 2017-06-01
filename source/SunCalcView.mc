@@ -260,9 +260,9 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
             var event_x = coordinate[0];
             var event_y = coordinate[1];
             if (event_y <= view.thirdHeight) {
-                onNextPage();
-            } else if (event_y >= (view.thirdHeight * 2)) {
                 onPreviousPage();
+            } else if (event_y >= (view.thirdHeight * 2)) {
+                onNextPage();
             } else {
                 view.waitingForGPS();
                 Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
