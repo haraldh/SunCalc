@@ -1,7 +1,7 @@
 <strings>
     <string id="AppName">SunCalc</string>
     <string id="AppVersion">V10</string>
-    
+    <string id="dash">-</string>
     <string id="showNightTitle">Show Night</string>
     <string id="showMorningTitle">Show Morning</string>
     <string id="showAfternoonTitle">Show Afternoon</string>
