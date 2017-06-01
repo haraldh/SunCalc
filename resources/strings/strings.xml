@@ -1,4 +1,16 @@
 <strings>
     <string id="AppName">SunCalc</string>
     <string id="AppVersion">V9</string>
+    
+    <string id="showNightTitle">Show Night</string>
+    <string id="showNauticalDawnTitle">Show Nautical Down</string>
+    <string id="showDawnTitle">Show Dawn</string>
+    <string id="showBlueDawnTitle">Show Morning Blue Hour</string>
+    <string id="showGoldenDawnTitle">Show Morning Golden Hour</string>
+    <string id="showNauticalDuskTitle">Show Nautical Dusk</string>
+    <string id="showDuskTitle">Show Dusk</string>
+    <string id="showBlueDuskTitle">Show Evening Blue Hour</string>
+    <string id="showGoldenDuskTitle">Show Evening Golden Hour</string>
+    <string id="showSunriseTitle">Show Sunrise</string>
+    <string id="showSunsetTitle">Show Sunset</string>
 </strings>

@@ -1,0 +1,38 @@
+<settings>
+    <setting propertyKey="@Properties.appVersion" title="@Strings.AppVersion">
+        <settingConfig type="alphaNumeric" readonly="true" />
+    </setting>
+    <setting propertyKey="@Properties.showNight" title="@Strings.showNightTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showNauticalDawn" title="@Strings.showNauticalDawnTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showDawn" title="@Strings.showDawnTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showBlueDawn" title="@Strings.showBlueDawnTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showGoldenDawn" title="@Strings.showGoldenDawnTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showNauticalDusk" title="@Strings.showNauticalDuskTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showDusk" title="@Strings.showDuskTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showBlueDusk" title="@Strings.showBlueDuskTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showGoldenDusk" title="@Strings.showGoldenDuskTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showSunrise" title="@Strings.showSunriseTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showSunset" title="@Strings.showSunsetTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+</settings>
