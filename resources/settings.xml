@@ -5,7 +5,16 @@
     <setting propertyKey="@Properties.showNight" title="@Strings.showNightTitle">
         <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showNauticalDawn" title="@Strings.showNauticalDawnTitle">
+    <setting propertyKey="@Properties.showMorning" title="@Strings.showNightTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showAfternoon" title="@Strings.showNightTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showAstronomicalDawn" title="@Strings.showNauticDawnTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showNauticDawn" title="@Strings.showNauticDawnTitle">
         <settingConfig type="boolean" required="true" />
     </setting>
     <setting propertyKey="@Properties.showDawn" title="@Strings.showDawnTitle">
@@ -17,7 +26,10 @@
     <setting propertyKey="@Properties.showGoldenDawn" title="@Strings.showGoldenDawnTitle">
         <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showNauticalDusk" title="@Strings.showNauticalDuskTitle">
+    <setting propertyKey="@Properties.showAstronomicalDusk" title="@Strings.showNauticDuskTitle">
+        <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showNauticDusk" title="@Strings.showNauticDuskTitle">
         <settingConfig type="boolean" required="true" />
     </setting>
     <setting propertyKey="@Properties.showDusk" title="@Strings.showDuskTitle">
