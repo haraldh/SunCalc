@@ -9,7 +9,7 @@ appName = $(shell grep entry manifest.xml | sed 's/.*entry="\([^"]*\).*/\1/' | s
 SIMULATOR = $(shell [ "$$(uname)" == "Linux" ] && echo "wine32 $(SDK_HOME)/bin/simulator.exe" || echo '$(SDK_HOME)/bin/connectiq')
 MONKEYC = java -Dfile.encoding=UTF-8 -Dapple.awt.UIElement=true -jar $(SDK_HOME)/bin/monkeybrains.jar
 
-.PHONY: build deploy buildall run package clean
+.PHONY: build deploy buildall run package clean sim
 
 all: build
 
@@ -36,19 +36,19 @@ buildall:
 	@for device in $(SUPPORTED_DEVICES_LIST); do \
 		echo "-----"; \
 		echo "Building for" $$device; \
-    $(MONKEYC)  --warn --output bin/$(appName)-$$device.prg -m manifest.xml \
-    -z $(resources) \
-    -y $(PRIVATE_KEY) \
-    -d $$device $(sources); \
+		$(MONKEYC) --warn --output bin/$(appName)-$$device.prg -m manifest.xml \
+			   -z $(resources) \
+			   -y $(PRIVATE_KEY) \
+                           -d $$device $(sources); \
 	done
 
 sim:
-	$(SIMULATOR) &
+	@pidof 'simulator.exe' &>/dev/null || ( $(SIMULATOR) & sleep 3 )
 
-run: bin/$(appName)-$(DEVICE).prg
+run: sim bin/$(appName)-$(DEVICE).prg
 	$(SDK_HOME)/bin/monkeydo bin/$(appName)-$(DEVICE).prg $(DEVICE) &
 
-test: bin/$(appName)-$(DEVICE)-test.prg
+test: sim bin/$(appName)-$(DEVICE)-test.prg
 	$(SDK_HOME)/bin/monkeydo bin/$(appName)-$(DEVICE)-test.prg $(DEVICE) -t
 
 $(DEPLOY)/$(appName).prg: bin/$(appName)-$(DEVICE).prg
