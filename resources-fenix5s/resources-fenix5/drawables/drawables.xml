@@ -1,0 +1,21 @@
+<drawables>
+		<drawable-list id="Arrow_updown">
+			<shape type="polygon" points="[[120,5], [109,15], [131,15]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[120,235], [109,225], [131,225]]" color="Gfx.COLOR_BLACK" />
+		</drawable-list>
+		<drawable-list id="Arrow_right">
+			<shape type="polygon" points="[[115,15], [115,35], [125,25]]" color="Gfx.COLOR_BLACK" />
+		</drawable-list>
+
+	    <drawable-list id="gray_horizontal_up_bar">
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="45" width="fill" height="2" />
+	    </drawable-list>
+	    <drawable-list id="gray_horizontal_down_bar">
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="dc.getHeight()-45" width="fill" height="2" />
+	    </drawable-list>
+	    <drawable-list id="white_background">
+	        <shape type="rectangle" color="Gfx.COLOR_WHITE" x="0" y="0" width="fill" height="fill" />
+	    </drawable-list>
+	    
+    <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+</drawables>
