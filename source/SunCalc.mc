@@ -1,5 +1,6 @@
 using Toybox.Math as Math;
 using Toybox.Time as Time;
+using Toybox.Position as Pos;
 
 class SunCalc {
 
@@ -50,7 +51,10 @@ class SunCalc {
     }
 
     // lat and lng in radians
-    function calculate(moment, lat, lng, what) {
+    function calculate(moment, pos, what) {
+        var lat = pos[0];
+        var lng = pos[1];
+
         var d = moment.value().toDouble() / DAYS - 0.5 + J1970 - J2000;
         if (lastD != d || lastLng != lng) {
             n = round(d - J0 + lng / PI2);
@@ -87,5 +91,94 @@ class SunCalc {
         var Jrise = Jnoon - (Jset - Jnoon);
 
         return fromJulian(Jrise);
+    }
+
+    function momentToString(moment, is24Hour) {
+
+        if (moment == null) {
+            return "--:--";
+        }
+
+        var tinfo = Time.Gregorian.info(new Time.Moment(moment.value() + 30), Time.FORMAT_SHORT);
+        var text;
+        if (is24Hour) {
+            text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
+        } else {
+            var hour = tinfo.hour % 12;
+            if (hour == 0) {
+                hour = 12;
+            }
+            text = hour.format("%02d") + ":" + tinfo.min.format("%02d");
+            // wtf... get used to 24 hour format...
+            if (tinfo.hour < 12 || tinfo.hour == 24) {
+                text = text + " AM";
+            } else {
+                text = text + " PM";
+            }
+        }
+        var today = Time.today();
+        var days = ((moment.value() - today.value()) / Time.Gregorian.SECONDS_PER_DAY).toNumber();
+
+        if (moment.value() > today.value() ) {
+            if (days > 0) {
+                text = text + " +" + days;
+            }
+        } else {
+            days = days - 1;
+            text = text + " " + days;
+        }
+        return text;
+    }
+
+    static function printMoment(moment) {
+        var info = Time.Gregorian.info(moment, Time.FORMAT_SHORT);
+        return info.day.format("%02d") + "." + info.month.format("%02d") + "." + info.year.toString()
+            + " " + info.hour.format("%02d") + ":" + info.min.format("%02d") + ":" + info.sec.format("%02d");
+    }
+
+    (:test) static function testCalc(logger) {
+
+        var testMatrix = [
+            [ 1496310905, 48.1009616, 11.759784, NOON, 1496315468 ],
+            [ 1496310905, 70.6632359, 23.681726, NOON, 1496312606 ],
+            [ 1496310905, 70.6632359, 23.681726, SUNSET, null ],
+            [ 1496310905, 70.6632359, 23.681726, SUNRISE, null ],
+            [ 1496310905, 70.6632359, 23.681726, ASTRO_DAWN, null ],
+            [ 1496310905, 70.6632359, 23.681726, NAUTIC_DAWN, null ],
+            [ 1496310905, 70.6632359, 23.681726, DAWN, null ],
+            [ 1483225200, 70.6632359, 23.681726, SUNRISE, null ],
+            [ 1483225200, 70.6632359, 23.681726, NOON, 1483266532 ],
+            [ 1483225200, 70.6632359, 23.681726, ASTRO_DAWN, 1483247635 ],
+            [ 1483225200, 70.6632359, 23.681726, NAUTIC_DAWN, 1483252565 ],
+            [ 1483225200, 70.6632359, 23.681726, DAWN, 1483259336 ]
+            ];
+
+        var sc = new SunCalc();
+        var moment;
+
+        for (var i = 0; i < testMatrix.size(); i++) {
+            moment = sc.calculate(new Time.Moment(testMatrix[i][0]),
+                                  new Pos.Location(
+                                      { :latitude => testMatrix[i][1], :longitude => testMatrix[i][2], :format => :degrees }
+                                      ).toRadians(),
+                                  testMatrix[i][3]);
+
+            if (   (moment == null  && testMatrix[i][4] != moment)
+                   || (moment != null && moment.value().toLong() != testMatrix[i][4])) {
+                var val;
+
+                if (moment == null) {
+                    val = "null";
+                } else {
+                    val = moment.value().toLong();
+                }
+
+                logger.debug("Expected " + testMatrix[i][4] + " but got: " + val);
+                logger.debug(printMoment(moment));
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -2,8 +2,8 @@
 // so this gets an extra file
 
 enum {
-    NIGHT_END,
-    NAUTICAL_DAWN,
+    ASTRO_DAWN,
+    NAUTIC_DAWN,
     DAWN,
     BLUE_HOUR_AM,
     SUNRISE,
@@ -15,7 +15,7 @@ enum {
     SUNSET,
     BLUE_HOUR_PM,
     DUSK,
-    NAUTICAL_DUSK,
-    NIGHT,
+    NAUTIC_DUSK,
+    ASTRO_DUSK,
     NUM_RESULTS
 }

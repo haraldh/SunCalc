@@ -17,8 +17,8 @@ class SunCalcView extends Ui.View {
     var hasLayout;
 
     const display = [
-        [ "Astr. Dawn", NIGHT_END, NAUTICAL_DAWN ],
-        [ "Nautic Dawn", NAUTICAL_DAWN, DAWN ],
+        [ "Astr. Dawn", ASTRO_DAWN, NAUTIC_DAWN ],
+        [ "Nautic Dawn", NAUTIC_DAWN, DAWN ],
         [ "Blue Hour", DAWN, BLUE_HOUR_AM ],
         [ "Civil Dawn", DAWN, SUNRISE ],
         [ "Sunrise", SUNRISE, SUNRISE_END ],
@@ -29,9 +29,9 @@ class SunCalcView extends Ui.View {
         [ "Sunset", SUNSET_START, SUNSET ],
         [ "Civil Dusk", SUNSET, DUSK ],
         [ "Blue Hour", BLUE_HOUR_PM, DUSK ],
-        [ "Nautic Dusk", DUSK, NAUTICAL_DUSK ],
-        [ "Astr. Dusk", NAUTICAL_DUSK, NIGHT ],
-        [ "Night", NIGHT, NIGHT+1 ]
+        [ "Nautic Dusk", DUSK, NAUTIC_DUSK ],
+        [ "Astr. Dusk", NAUTIC_DUSK, ASTRO_DUSK ],
+        [ "Night", ASTRO_DUSK, ASTRO_DUSK+1 ]
         ];
 
     var display_index;
@@ -121,51 +121,14 @@ class SunCalcView extends Ui.View {
         myUpdate();
     }
 
-    function momentToString(moment) {
-
-        if (moment == null) {
-            return "--:--";
-        }
-
-        var tinfo = Time.Gregorian.info(new Time.Moment(moment.value() + 30), Time.FORMAT_SHORT);
-        var text;
-        if (is24Hour) {
-            text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
-        } else {
-            var hour = tinfo.hour % 12;
-            if (hour == 0) {
-                hour = 12;
-            }
-            text = hour.format("%02d") + ":" + tinfo.min.format("%02d");
-            // wtf... get used to 24 hour format...
-            if (tinfo.hour < 12 || tinfo.hour == 24) {
-                text = text + " AM";
-            } else {
-                text = text + " PM";
-            }
-        }
-        var today = Time.today();
-        var days = ((moment.value() - today.value()) / Time.Gregorian.SECONDS_PER_DAY).toNumber();
-
-        if (moment.value() > today.value() ) {
-            if (days > 0) {
-                text = text + " +" + days;
-            }
-        } else {
-            days = days - 1;
-            text = text + " " + days;
-        }
-        return text;
-    }
-
     function getMoment(what) {
         var day = DAY_IN_ADVANCE;
-        if (what > NIGHT) {
+        if (what > ASTRO_DUSK) {
             day++;
-            what = NIGHT_END;
+            what = ASTRO_DAWN;
         }
         now = Time.now();
-        return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc[0], lastLoc[1], what);
+        return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
     }
 
     function onUpdate(dc) {
@@ -195,8 +158,8 @@ class SunCalcView extends Ui.View {
         }
         findDrawableById("what").setText(display[display_index][0]);
 
-        findDrawableById("time_from").setText(momentToString(getMoment(display[display_index][1])));
-        findDrawableById("time_to").setText(momentToString(getMoment(display[display_index][2])));
+        findDrawableById("time_from").setText(sc.momentToString(getMoment(display[display_index][1]), is24Hour));
+        findDrawableById("time_to").setText(sc.momentToString(getMoment(display[display_index][2]), is24Hour));
 
         Ui.requestUpdate();
     }
