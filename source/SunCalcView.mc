@@ -76,21 +76,19 @@ class SunCalcView extends Ui.View {
         var loc = info.position.toRadians();
         self.lastLoc = loc;
 
-        if (!listView) {
-            DAY_IN_ADVANCE = 0;
-            display_index = 0; // NOON
-            var moment = getMoment(NOON);
+        DAY_IN_ADVANCE = 0;
+        display_index = 0; // NOON
+        var moment = getMoment(NOON);
 
-            if (moment.value() > now.value()) {
-                display_index = 7;
-            }
+        if (now.value() > moment.value()) {
+            display_index = 7;
+        }
 
+        moment = getMoment(display[display_index][2]);
+
+        while((moment == null) || now.value() > moment.value() ) {
+            displayNext();
             moment = getMoment(display[display_index][2]);
-
-            while((moment == null) || moment.value() < now.value()) {
-                displayNext();
-                moment = getMoment(display[display_index][2]);
-            }
         }
 
         myUpdate();
