@@ -2,8 +2,8 @@ include properties.mk
 
 SUPPORTED_DEVICES_LIST = $(shell sed -n -e 's/<iq:product id="\(.*\)"\/>/\1/p' manifest.xml)
 SOURCES = $(shell find source -name '[^.]*.mc')
-RESOURCE_FLAGS = $(shell find RESOURCE_FLAGS* -name '[^.]*.xml' | tr '\n' ':' | sed 's/.$$//')
-RESFILES = $(shell find RESOURCE_FLAGS* -name '[^.]*.xml')
+RESOURCE_FLAGS = $(shell find resources* -name '[^.]*.xml' | tr '\n' ':' | sed 's/.$$//')
+RESFILES = $(shell find resources* -name '[^.]*.xml')
 APPNAME = $(shell grep entry manifest.xml | sed 's/.*entry="\([^"]*\).*/\1/' | sed 's/App$$//')
 SIMULATOR = $(shell [ "$$(uname)" == "Linux" ] && echo "wine32 $(SDK_HOME)/bin/simulator.exe" || echo '$(SDK_HOME)/bin/connectiq')
 MONKEYC = java -Dfile.encoding=UTF-8 -Dapple.awt.UIElement=true -jar $(SDK_HOME)/bin/monkeybrains.jar
