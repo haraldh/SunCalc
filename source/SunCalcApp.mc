@@ -11,13 +11,11 @@ function getPropertyDef(key, def) {
     }
 }
 
+
 class SunCalcApp extends App.AppBase {
     function initialize() {
         AppBase.initialize();
         AB = self;
-        for (var i = 0; i < DISPLAY.size(); i++) {
-            DISPLAY[i][D_SHOW] = getPropertyDef(DISPLAY[i][D_PROP], true);
-        }
     }
 
     //! Return the initial view of your application here
@@ -27,4 +25,9 @@ class SunCalcApp extends App.AppBase {
         return [ view, new SunCalcDelegate(view, false) ];
     }
 
+    function onSettingsChanged(object) {
+        for (var i = 0; i < DISPLAY.size(); i++) {
+           DISPLAY[i][D_SHOW] = getPropertyDef(DISPLAY[i][D_PROP], true);
+        }
+    }
 }

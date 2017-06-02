@@ -6,24 +6,32 @@ using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 
 var DISPLAY = [
-    [ "Astr. Dawn", ASTRO_DAWN, NAUTIC_DAWN, :Astro, :AM, "showAstroDawn", true],
-    [ "Nautic Dawn", NAUTIC_DAWN, DAWN, :Nautic, :AM, "showNauticDawn", true ],
-    [ "Blue Hour", DAWN, BLUE_HOUR_AM, :Blue, :AM, "showBlueDawn", true ],
-    [ "Civil Dawn", DAWN, SUNRISE, :Civil, :AM, "showDawn", true ],
-    [ "Sunrise", SUNRISE, SUNRISE_END, :Sunrise, :AM, "showSunrise", true ],
-    [ "Golden Hour", BLUE_HOUR_AM, GOLDEN_HOUR_AM, :Golden, :AM, "showGoldenDawn", true ],
-    [ "Morning", SUNRISE, NOON, :Noon, :AM, "showMorning", true ],
-    [ "Afternoon", NOON, SUNSET, :Noon, :PM, "showAfternoon", true ],
-    [ "Golden Hour", GOLDEN_HOUR_PM, BLUE_HOUR_PM, :Golden, :PM, "showGoldenDusk", true ],
-    [ "Sunset", SUNSET_START, SUNSET, :Sunrise, :PM, "showSunset", true ],
-    [ "Civil Dusk", SUNSET, DUSK, :Civil, :PM, "showDusk", true ],
-    [ "Blue Hour", BLUE_HOUR_PM, DUSK, :Blue, :PM, "showBlueDusk", true ],
-    [ "Nautic Dusk", DUSK, NAUTIC_DUSK, :Nautic, :PM, "showNauticDusk", true ],
-    [ "Astr. Dusk", NAUTIC_DUSK, ASTRO_DUSK, :Astro, :PM, "showAstroDusk", true ],
-    [ "Night", ASTRO_DUSK, ASTRO_DUSK+1, :Night, :PM, "showNight", true ]
+    [ "Astr. Dawn", ASTRO_DAWN, NAUTIC_DAWN, :Astro, :AM, "showAstroDawn", null],
+    [ "Nautic Dawn", NAUTIC_DAWN, DAWN, :Nautic, :AM, "showNauticDawn", null],
+    [ "Blue Hour", DAWN, BLUE_HOUR_AM, :Blue, :AM, "showBlueDawn", null],
+    [ "Civil Dawn", DAWN, SUNRISE, :Civil, :AM, "showDawn", null],
+    [ "Sunrise", SUNRISE, SUNRISE_END, :Sunrise, :AM, "showSunrise", null],
+    [ "Golden Hour", BLUE_HOUR_AM, GOLDEN_HOUR_AM, :Golden, :AM, "showGoldenDawn", null],
+    [ "Morning", SUNRISE, NOON, :Noon, :AM, "showMorning", null],
+    [ "Afternoon", NOON, SUNSET, :Noon, :PM, "showAfternoon", null],
+    [ "Golden Hour", GOLDEN_HOUR_PM, BLUE_HOUR_PM, :Golden, :PM, "showGoldenDusk", null],
+    [ "Sunset", SUNSET_START, SUNSET, :Sunrise, :PM, "showSunset", null],
+    [ "Civil Dusk", SUNSET, DUSK, :Civil, :PM, "showDusk", null],
+    [ "Blue Hour", BLUE_HOUR_PM, DUSK, :Blue, :PM, "showBlueDusk", null],
+    [ "Nautic Dusk", DUSK, NAUTIC_DUSK, :Nautic, :PM, "showNauticDusk", null],
+    [ "Astr. Dusk", NAUTIC_DUSK, ASTRO_DUSK, :Astro, :PM, "showAstroDusk", null],
+    [ "Night", ASTRO_DUSK, ASTRO_DUSK+1, :Night, :PM, "showNight", null]
     ];
 
-var CHECK_DISPLAY = true;
+var NO_DISPLAY = false;
+
+function shouldShow(i) {
+    if (DISPLAY[i][D_SHOW] == null) {
+        DISPLAY[i][D_SHOW] = getPropertyDef(DISPLAY[i][D_PROP], true);
+    }
+    return DISPLAY[i][D_SHOW];
+}
+
 
 class SunCalcView extends Ui.View {
 
@@ -85,87 +93,88 @@ class SunCalcView extends Ui.View {
         */
 
         DAY_IN_ADVANCE = 0;
-        mDI = 0; // NOON
+        mDI = 0; // morning
+
         var moment = getMoment(NOON);
 
         if (now.value() > moment.value()) {
             mDI = 7;
         }
+        displayPrevious();
+        displayNext();
 
         moment = getMoment(DISPLAY[mDI][D_TO]);
 
-        while((moment == null) || now.value() > moment.value() ) {
+        while((moment == null) || ( now.value() > moment.value() )) {
+            Sys.println("displayNext()");
             if (!displayNext()) {
                 break;
             }
             moment = getMoment(DISPLAY[mDI][D_TO]);
+
             if (mDI == 6) {
+                Sys.println("No sunrise:");
                 // The sun didn't rise today
-                // Display Morning
-                break;
-            }
-            if (DAY_IN_ADVANCE > 0) {
-                // The sun does go down today or did not rise.
-                // Display Afternoon
-                mDI = 7;
+                // Display anything to show after midnight
                 DAY_IN_ADVANCE = 0;
+                mDI = 0;
+                displayNext();
+                break;
+            }
+
+            if (DAY_IN_ADVANCE > 0) {
+                Sys.println("No sunset:");
+                // The sun does go down today or did not rise.
+                // Display anything to show after afternoon
+                DAY_IN_ADVANCE = 0;
+                mDI = 7;
+                displayNext();
                 break;
             }
         }
-
         myUpdate();
-    }
-
-    function checkDisplay()
-    {
-        for (var i = 0; i < DISPLAY.size(); i++) {
-            if (DISPLAY[i][D_SHOW]) {
-                return true;
-            }
-        }
-        return false;
     }
 
     function displayPrevious()
     {
-        if (CHECK_DISPLAY) {
-            if(!checkDisplay()) {
-                return false;
-            }
-            CHECK_DISPLAY = false;
-        }
+        var started = mDI;
         while (true) {
             mDI--;
             if (mDI < 0) {
                 DAY_IN_ADVANCE--;
                 mDI = DISPLAY.size() - 1;
             }
-            if (DISPLAY[mDI][D_SHOW]) {
+            if (shouldShow(mDI)) {
+                NO_DISPLAY = false;
+                return true;
+            }
+            if (mDI == started) {
                 break;
             }
         }
-        return true;
+        NO_DISPLAY = true;
+        return false;
     }
 
     function displayNext()
     {
-        if (CHECK_DISPLAY) {
-            if(!checkDisplay()) {
-                return false;
-            }
-            CHECK_DISPLAY = false;
-        }
+        var started = mDI;
         while (true) {
             mDI++;
             if (mDI >= DISPLAY.size()) {
                 DAY_IN_ADVANCE++;
                 mDI = 0;
             }
-            if (DISPLAY[mDI][D_SHOW]) {
+            if (shouldShow(mDI)) {
+                NO_DISPLAY = false;
+                return true;
+            }
+            if (mDI == started) {
                 break;
             }
         }
-        return true;
+        NO_DISPLAY = true;
+        return false;
     }
 
     function waitingForGPS() {
@@ -210,7 +219,7 @@ class SunCalcView extends Ui.View {
             return;
         }
 
-        if (CHECK_DISPLAY) {
+        if (NO_DISPLAY) {
             findDrawableById("what").setText("");
             findDrawableById("time_from").setText(Rez.Strings.NothingToDisplay);
             findDrawableById("time_to").setText(Rez.Strings.PressMenu);
@@ -273,7 +282,6 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
 
     function onMenu() {
         Ui.pushView(new Rez.Menus.SettingsMenu(), new SettingsMenuDelegate(), Ui.SLIDE_UP);
-        CHECK_DISPLAY = true;
         return true;
     }
 

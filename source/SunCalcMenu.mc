@@ -10,10 +10,10 @@ class SettingsMenuAMPM extends Ui.Menu {
         Menu.setTitle(Rez.Strings.SettingsMenuTitleAMPM);
 
         if (indexAM != null) {
-            showAM = DISPLAY[indexAM][D_SHOW];
+            showAM = shouldShow(indexAM);
         }
         if (indexPM != null) {
-            showPM = DISPLAY[indexPM][D_SHOW];
+            showPM = shouldShow(indexPM);
         }
 
         if (showAM != null) {
@@ -56,10 +56,8 @@ class SettingsMenuAMPMDelegate extends Ui.MenuInputDelegate {
             DISPLAY[mIndexPM][D_SHOW] = !DISPLAY[mIndexPM][D_SHOW];
             AB.setProperty(DISPLAY[mIndexPM][D_PROP], DISPLAY[mIndexPM][D_SHOW]);
         }
-
         Ui.popView(Ui.SLIDE_IMMEDIATE);
-        Ui.pushView(new SettingsMenuAMPM(mIndexAM, mIndexPM), new SettingsMenuAMPMDelegate(mIndexAM, mIndexPM), Ui.SLIDE_IMMEDIATE);
-        return true;
+        Ui.pushView(new SettingsMenuAMPM(mIndexAM, mIndexPM), self, Ui.SLIDE_IMMEDIATE);
     }
 }
 
