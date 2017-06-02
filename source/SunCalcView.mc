@@ -5,6 +5,26 @@ using Toybox.Math as Math;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 
+var DISPLAY = [
+    [ "Astr. Dawn", ASTRO_DAWN, NAUTIC_DAWN, :Astro, :AM, "showAstroDawn", true],
+    [ "Nautic Dawn", NAUTIC_DAWN, DAWN, :Nautic, :AM, "showNauticDawn", true ],
+    [ "Blue Hour", DAWN, BLUE_HOUR_AM, :Blue, :AM, "showBlueDawn", true ],
+    [ "Civil Dawn", DAWN, SUNRISE, :Civil, :AM, "showDawn", true ],
+    [ "Sunrise", SUNRISE, SUNRISE_END, :Sunrise, :AM, "showSunrise", true ],
+    [ "Golden Hour", BLUE_HOUR_AM, GOLDEN_HOUR_AM, :Golden, :AM, "showGoldenDawn", true ],
+    [ "Morning", SUNRISE, NOON, :Noon, :AM, "showMorning", true ],
+    [ "Afternoon", NOON, SUNSET, :Noon, :PM, "showAfternoon", true ],
+    [ "Golden Hour", GOLDEN_HOUR_PM, BLUE_HOUR_PM, :Golden, :PM, "showGoldenDusk", true ],
+    [ "Sunset", SUNSET_START, SUNSET, :Sunrise, :PM, "showSunset", true ],
+    [ "Civil Dusk", SUNSET, DUSK, :Civil, :PM, "showDusk", true ],
+    [ "Blue Hour", BLUE_HOUR_PM, DUSK, :Blue, :PM, "showBlueDusk", true ],
+    [ "Nautic Dusk", DUSK, NAUTIC_DUSK, :Nautic, :PM, "showNauticDusk", true ],
+    [ "Astr. Dusk", NAUTIC_DUSK, ASTRO_DUSK, :Astro, :PM, "showAstroDusk", true ],
+    [ "Night", ASTRO_DUSK, ASTRO_DUSK+1, :Night, :PM, "showNight", true ]
+    ];
+
+var CHECK_DISPLAY = true;
+
 class SunCalcView extends Ui.View {
 
     var sc;
@@ -15,26 +35,7 @@ class SunCalcView extends Ui.View {
     var thirdHeight;
     var is24Hour;
     var hasLayout;
-
-    const display = [
-        [ "Astr. Dawn", ASTRO_DAWN, NAUTIC_DAWN ],
-        [ "Nautic Dawn", NAUTIC_DAWN, DAWN ],
-        [ "Blue Hour", DAWN, BLUE_HOUR_AM ],
-        [ "Civil Dawn", DAWN, SUNRISE ],
-        [ "Sunrise", SUNRISE, SUNRISE_END ],
-        [ "Golden Hour", BLUE_HOUR_AM, GOLDEN_HOUR_AM ],
-        [ "Morning", SUNRISE, NOON ],
-        [ "Afternoon", NOON, SUNSET ],
-        [ "Golden Hour", GOLDEN_HOUR_PM, BLUE_HOUR_PM ],
-        [ "Sunset", SUNSET_START, SUNSET ],
-        [ "Civil Dusk", SUNSET, DUSK ],
-        [ "Blue Hour", BLUE_HOUR_PM, DUSK ],
-        [ "Nautic Dusk", DUSK, NAUTIC_DUSK ],
-        [ "Astr. Dusk", NAUTIC_DUSK, ASTRO_DUSK ],
-        [ "Night", ASTRO_DUSK, ASTRO_DUSK+1 ]
-        ];
-
-    var display_index;
+    var mDI;
 
     function initialize() {
         View.initialize();
@@ -44,7 +45,7 @@ class SunCalcView extends Ui.View {
         // for testing now = new Time.Moment(1483225200);
         DAY_IN_ADVANCE = 0;
         lastLoc = null;
-        display_index = 0;
+        mDI = 0;
         thirdHeight = null;
         is24Hour = Sys.getDeviceSettings().is24Hour;
         hasLayout = false;
@@ -84,19 +85,21 @@ class SunCalcView extends Ui.View {
         */
 
         DAY_IN_ADVANCE = 0;
-        display_index = 0; // NOON
+        mDI = 0; // NOON
         var moment = getMoment(NOON);
 
         if (now.value() > moment.value()) {
-            display_index = 7;
+            mDI = 7;
         }
 
-        moment = getMoment(display[display_index][2]);
+        moment = getMoment(DISPLAY[mDI][D_TO]);
 
         while((moment == null) || now.value() > moment.value() ) {
-            displayNext();
-            moment = getMoment(display[display_index][2]);
-            if (display_index == 6) {
+            if (!displayNext()) {
+                break;
+            }
+            moment = getMoment(DISPLAY[mDI][D_TO]);
+            if (mDI == 6) {
                 // The sun didn't rise today
                 // Display Morning
                 break;
@@ -104,7 +107,7 @@ class SunCalcView extends Ui.View {
             if (DAY_IN_ADVANCE > 0) {
                 // The sun does go down today or did not rise.
                 // Display Afternoon
-                display_index = 7;
+                mDI = 7;
                 DAY_IN_ADVANCE = 0;
                 break;
             }
@@ -113,22 +116,56 @@ class SunCalcView extends Ui.View {
         myUpdate();
     }
 
+    function checkDisplay()
+    {
+        for (var i = 0; i < DISPLAY.size(); i++) {
+            if (DISPLAY[i][D_SHOW]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function displayPrevious()
     {
-        display_index--;
-        if (display_index < 0) {
-            DAY_IN_ADVANCE--;
-            display_index = display.size() - 1;
+        if (CHECK_DISPLAY) {
+            if(!checkDisplay()) {
+                return false;
+            }
+            CHECK_DISPLAY = false;
         }
+        while (true) {
+            mDI--;
+            if (mDI < 0) {
+                DAY_IN_ADVANCE--;
+                mDI = DISPLAY.size() - 1;
+            }
+            if (DISPLAY[mDI][D_SHOW]) {
+                break;
+            }
+        }
+        return true;
     }
 
     function displayNext()
     {
-        display_index++;
-        if (display_index >= display.size()) {
-            DAY_IN_ADVANCE++;
-            display_index = 0;
+        if (CHECK_DISPLAY) {
+            if(!checkDisplay()) {
+                return false;
+            }
+            CHECK_DISPLAY = false;
         }
+        while (true) {
+            mDI++;
+            if (mDI >= DISPLAY.size()) {
+                DAY_IN_ADVANCE++;
+                mDI = 0;
+            }
+            if (DISPLAY[mDI][D_SHOW]) {
+                break;
+            }
+        }
+        return true;
     }
 
     function waitingForGPS() {
@@ -166,24 +203,33 @@ class SunCalcView extends Ui.View {
             return;
         }
         if (lastLoc == null) {
-            findDrawableById("what").setText("Waiting for GPS");
+            findDrawableById("what").setText(Rez.Strings.WaitingForGPS);
             findDrawableById("time_from").setText("");
             findDrawableById("time_to").setText("");
             Ui.requestUpdate();
             return;
         }
-        findDrawableById("what").setText(display[display_index][0]);
-        var from = getMoment(display[display_index][1]);
-        var to = getMoment(display[display_index][2]);
+
+        if (CHECK_DISPLAY) {
+            findDrawableById("what").setText("");
+            findDrawableById("time_from").setText(Rez.Strings.NothingToDisplay);
+            findDrawableById("time_to").setText(Rez.Strings.PressMenu);
+            Ui.requestUpdate();
+            return;
+        }
+
+        findDrawableById("what").setText(DISPLAY[mDI][D_TITLE]);
+        var from = getMoment(DISPLAY[mDI][D_FROM]);
+        var to = getMoment(DISPLAY[mDI][D_TO]);
 
         if (from == null && to != null) {
             // test if this started the day before
-            var what = (2 * NOON - display[display_index][2]) % NUM_RESULTS;
+            var what = (2 * NOON - DISPLAY[mDI][D_TO]) % NUM_RESULTS;
             var day = DAY_IN_ADVANCE - 1;
             from = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
         } else if (to == null && from != null) {
             // test if this ends the day after
-            var what = (2 * NOON - display[display_index][1]) % NUM_RESULTS;
+            var what = (2 * NOON - DISPLAY[mDI][D_FROM]) % NUM_RESULTS;
             var day = DAY_IN_ADVANCE + 1;
             to = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
         }
@@ -223,6 +269,12 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
             }
         }
         return BehaviorDelegate.onKey(key);
+    }
+
+    function onMenu() {
+        Ui.pushView(new Rez.Menus.SettingsMenu(), new SettingsMenuDelegate(), Ui.SLIDE_UP);
+        CHECK_DISPLAY = true;
+        return true;
     }
 
     function onPosition(info) {

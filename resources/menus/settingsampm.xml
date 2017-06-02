@@ -1,0 +1,4 @@
+<menu id="SettingsMenuAMPM" title="@Strings.SettingsMenuTitleAMPM">
+    <menu-item id="AM">@Strings.MenuAM</menu-item>
+    <menu-item id="PM">@Strings.MenuPM</menu-item>
+</menu>

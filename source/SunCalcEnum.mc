@@ -19,3 +19,13 @@ enum {
     ASTRO_DUSK,
     NUM_RESULTS
 }
+
+enum {
+    D_TITLE,
+    D_FROM,
+    D_TO,
+    D_MENU,
+    D_AMPM,
+    D_PROP,
+    D_SHOW
+}

@@ -1,0 +1,10 @@
+<menu id="SettingsMenu" title="@Strings.SettingsMenuTitle">
+    <menu-item id="Night">@Strings.MenuNight</menu-item>
+    <menu-item id="Astro">@Strings.MenuAstro</menu-item>
+    <menu-item id="Nautic">@Strings.MenuNautic</menu-item>
+    <menu-item id="Blue">@Strings.MenuBlue</menu-item>
+    <menu-item id="Civil">@Strings.MenuCivil</menu-item>
+    <menu-item id="Sunrise">@Strings.MenuSunrise</menu-item>
+    <menu-item id="Golden">@Strings.MenuGolden</menu-item>
+    <menu-item id="Noon">@Strings.MenuNoon</menu-item>
+</menu>
