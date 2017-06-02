@@ -1,5 +1,5 @@
 using Toybox.WatchUi as Ui;
-using Toybox.Position as Position;
+using Toybox.Position as Pos;
 using Toybox.Time as Time;
 using Toybox.Math as Math;
 using Toybox.Graphics as Gfx;
@@ -41,6 +41,7 @@ class SunCalcView extends Ui.View {
         sc = new SunCalc();
         listView = false;
         now = Time.now();
+        // for testing now = new Time.Moment(1483225200);
         DAY_IN_ADVANCE = 0;
         lastLoc = null;
         display_index = 0;
@@ -55,9 +56,9 @@ class SunCalcView extends Ui.View {
         hasLayout = true;
         thirdHeight = dc.getHeight() / 3;
 
-        var info = Position.getInfo();
-        if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
-            Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:setPosition));
+        var info = Pos.getInfo();
+        if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
+            Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:setPosition));
             findDrawableById("what").setText("Waiting for GPS");
             findDrawableById("time_from").setText("");
             findDrawableById("time_to").setText("");
@@ -68,13 +69,19 @@ class SunCalcView extends Ui.View {
 
     function setPosition(info) {
 
-        if (info == null || info.accuracy == Position.QUALITY_NOT_AVAILABLE) {
+        if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
             return;
         }
 
-        now = Time.now();
         var loc = info.position.toRadians();
         self.lastLoc = loc;
+        now = Time.now();
+        /* For testing
+           now = new Time.Moment(1483225200);
+           self.lastLoc = new Pos.Location(
+            { :latitude => 70.6632359, :longitude => 23.681726, :format => :degrees }
+            ).toRadians();
+        */
 
         DAY_IN_ADVANCE = 0;
         display_index = 0; // NOON
@@ -89,6 +96,18 @@ class SunCalcView extends Ui.View {
         while((moment == null) || now.value() > moment.value() ) {
             displayNext();
             moment = getMoment(display[display_index][2]);
+            if (display_index == 6) {
+                // The sun didn't rise today
+                // Display Morning
+                break;
+            }
+            if (DAY_IN_ADVANCE > 0) {
+                // The sun does go down today or did not rise.
+                // Display Afternoon
+                display_index = 7;
+                DAY_IN_ADVANCE = 0;
+                break;
+            }
         }
 
         myUpdate();
@@ -124,6 +143,7 @@ class SunCalcView extends Ui.View {
             what = ASTRO_DAWN;
         }
         now = Time.now();
+        // for testing now = new Time.Moment(1483225200);
         return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
     }
 
@@ -153,9 +173,23 @@ class SunCalcView extends Ui.View {
             return;
         }
         findDrawableById("what").setText(display[display_index][0]);
+        var from = getMoment(display[display_index][1]);
+        var to = getMoment(display[display_index][2]);
 
-        findDrawableById("time_from").setText(sc.momentToString(getMoment(display[display_index][1]), is24Hour));
-        findDrawableById("time_to").setText(sc.momentToString(getMoment(display[display_index][2]), is24Hour));
+        if (from == null && to != null) {
+            // test if this started the day before
+            var what = (2 * NOON - display[display_index][2]) % NUM_RESULTS;
+            var day = DAY_IN_ADVANCE - 1;
+            from = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
+        } else if (to == null && from != null) {
+            // test if this ends the day after
+            var what = (2 * NOON - display[display_index][1]) % NUM_RESULTS;
+            var day = DAY_IN_ADVANCE + 1;
+            to = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
+        }
+
+        findDrawableById("time_from").setText(sc.momentToString(from, is24Hour));
+        findDrawableById("time_to").setText(sc.momentToString(to, is24Hour));
 
         Ui.requestUpdate();
     }
@@ -180,7 +214,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
         if (k == Ui.KEY_ENTER || k == Ui.KEY_START || k == Ui.KEY_RIGHT) {
             if (enter) {
                 view.waitingForGPS();
-                Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
+                Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:onPosition));
                 return true;
             } else {
                 view.setListView(true);
@@ -235,7 +269,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
     }
 
     function onBack() {
-        Position.enableLocationEvents(Position.LOCATION_DISABLE, method(:onPosition));
+        Pos.enableLocationEvents(Pos.LOCATION_DISABLE, method(:onPosition));
 
         if (enter) {
             view.setListView(false);
@@ -261,7 +295,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
                 onNextPage();
             } else {
                 view.waitingForGPS();
-                Position.enableLocationEvents(Position.LOCATION_ONE_SHOT, method(:onPosition));
+                Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:onPosition));
             }
         } else {
             view.setListView(true);
