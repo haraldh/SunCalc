@@ -16,6 +16,4 @@
 	    <drawable-list id="white_background">
 	        <shape type="rectangle" color="Gfx.COLOR_WHITE" x="0" y="0" width="fill" height="fill" />
 	    </drawable-list>
-
-    <bitmap id="LauncherIcon" filename="launcher_icon.png" />
 </drawables>
