@@ -13,14 +13,14 @@ class SunCalc {
         J0 = 0.0009;
 
     hidden const TIMES = [
-        -18 * RAD,
-        -12 * RAD,
-        -6 * RAD,
-        -4 * RAD,
-        -0.833 * RAD,
-        -0.3 * RAD,
-        6 * RAD,
-        null,
+        -18 * RAD,    // ASTRO_DAWN
+        -12 * RAD,    // NAUTIC_DAWN
+        -6 * RAD,     // DAWN
+        -4 * RAD,     // BLUE_HOUR
+        -0.833 * RAD, // SUNRISE
+        -0.3 * RAD,   // SUNRISE_END
+        6 * RAD,      // GOLDEN_HOUR_AM
+        null,         // NOON
         6 * RAD,
         -0.3 * RAD,
         -0.833 * RAD,
