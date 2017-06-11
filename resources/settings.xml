@@ -39,12 +39,6 @@
     <setting propertyKey="@Properties.showNight" title="@Strings.showNightTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showMorning" title="@Strings.showNightTitle">
-      <settingConfig type="boolean" required="true" />
-    </setting>
-    <setting propertyKey="@Properties.showAfternoon" title="@Strings.showNightTitle">
-      <settingConfig type="boolean" required="true" />
-    </setting>
     <setting propertyKey="@Properties.showAstroDawn" title="@Strings.showAstroDawnTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
@@ -57,13 +51,22 @@
     <setting propertyKey="@Properties.showBlueDawn" title="@Strings.showBlueDawnTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
+    <setting propertyKey="@Properties.showSunrise" title="@Strings.showSunriseTitle">
+      <settingConfig type="boolean" required="true" />
+    </setting>
     <setting propertyKey="@Properties.showGoldenDawn" title="@Strings.showGoldenDawnTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showAstroDusk" title="@Strings.showAstroDuskTitle">
+    <setting propertyKey="@Properties.showMorning" title="@Strings.showMorningTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showNauticDusk" title="@Strings.showNauticDuskTitle">
+    <setting propertyKey="@Properties.showAfternoon" title="@Strings.showAfternoonTitle">
+      <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showGoldenDusk" title="@Strings.showGoldenDuskTitle">
+      <settingConfig type="boolean" required="true" />
+    </setting>
+    <setting propertyKey="@Properties.showSunset" title="@Strings.showSunsetTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
     <setting propertyKey="@Properties.showDusk" title="@Strings.showDuskTitle">
@@ -72,13 +75,10 @@
     <setting propertyKey="@Properties.showBlueDusk" title="@Strings.showBlueDuskTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showGoldenDusk" title="@Strings.showGoldenDuskTitle">
+    <setting propertyKey="@Properties.showNauticDusk" title="@Strings.showNauticDuskTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
-    <setting propertyKey="@Properties.showSunrise" title="@Strings.showSunriseTitle">
-      <settingConfig type="boolean" required="true" />
-    </setting>
-    <setting propertyKey="@Properties.showSunset" title="@Strings.showSunsetTitle">
+    <setting propertyKey="@Properties.showAstroDusk" title="@Strings.showAstroDuskTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
   </settings>

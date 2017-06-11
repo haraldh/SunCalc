@@ -1,6 +1,6 @@
 <strings>
     <string id="AppName">SunCalc</string>
-    <string id="AppVersion">V10</string>
+    <string id="AppVersion">V11</string>
     <string id="dash">-</string>
     <string id="WaitingForGPS">Waiting for GPS</string>
     <string id="NothingToDisplay">Nothing to Display</string>
