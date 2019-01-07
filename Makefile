@@ -59,3 +59,20 @@ package:
 	@$(MONKEYC) --warn -e --output bin/$(APPNAME).iq \
 	-f monkey.jungle \
 	-y $(PRIVATE_KEY) -r
+
+printdevices:
+	@printf "%s\n" $(SUPPORTED_DEVICES_LIST)
+
+printsupported:
+	@for dev in $$( \
+		for i in \
+			resources-rectangle-148x205 \
+			resources-rectangle-205x148 \
+			resources-round-218x218 \
+			resources-round-240x240 \
+			resources-semiround-215x180 \
+			; do \
+			grep $${i#resources-} $(SDK_HOME)/bin/devices.xml; \
+		done | sed -n -e 's/.*id="\([^"]*\)".*/\1/p' | sort); do \
+		echo "      <iq:product id=\"$$dev\"/>"; \
+	done

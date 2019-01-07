@@ -9,6 +9,8 @@
     <string id="MenuBack">Back</string>
     <string id="MenuOn">On</string>
     <string id="MenuOff">Off</string>
+    <string id="MenuAM">AM</string>
+    <string id="MenuPM">PM</string>
     <string id="MenuAMOn">Before Noon - On</string>
     <string id="MenuPMOn">After Noon - On</string>
     <string id="MenuAMOff">Before Noon - Off</string>
