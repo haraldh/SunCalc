@@ -19,26 +19,26 @@ clean:
 build: bin/$(APPNAME)-$(DEVICE).prg
 
 bin/$(APPNAME)-$(DEVICE).prg: $(SOURCES) $(RESFILES)
-	$(MONKEYC) --warn --output bin/$(APPNAME)-$(DEVICE).prg -m manifest.xml \
-	-z $(RESOURCE_FLAGS) \
+	$(MONKEYC) --warn --output bin/$(APPNAME)-$(DEVICE).prg \
+	-f monkey.jungle \
 	-y $(PRIVATE_KEY) \
-	-d $(DEVICE) $(SOURCES)
+	-d $(DEVICE)
 
 bin/$(APPNAME)-$(DEVICE)-test.prg: $(SOURCES) $(RESFILES)
-	$(MONKEYC) --warn --output bin/$(APPNAME)-$(DEVICE)-test.prg -m manifest.xml \
-	-z $(RESOURCE_FLAGS) \
+	$(MONKEYC) --warn --output bin/$(APPNAME)-$(DEVICE)-test.prg \
+	-f monkey.jungle \
 	-y $(PRIVATE_KEY) \
 	--unit-test \
-	-d $(DEVICE) $(SOURCES)
+	-d $(DEVICE)
 
 buildall:
 	@for device in $(SUPPORTED_DEVICES_LIST); do \
 		echo "-----"; \
 		echo "Building for" $$device; \
-		$(MONKEYC) --warn --output bin/$(APPNAME)-$$device.prg -m manifest.xml \
-			   -z $(RESOURCE_FLAGS) \
+		$(MONKEYC) --warn --output bin/$(APPNAME)-$$device.prg \
+		           -f monkey.jungle \
 			   -y $(PRIVATE_KEY) \
-                           -d $$device $(SOURCES); \
+                           -d $$device; \
 	done
 
 sim:
@@ -56,7 +56,6 @@ $(DEPLOY)/$(APPNAME).prg: bin/$(APPNAME)-$(DEVICE).prg
 deploy: build $(DEPLOY)/$(APPNAME).prg
 
 package:
-	@$(MONKEYC) --warn -e --output bin/$(APPNAME).iq -m manifest.xml \
-	-z $(RESOURCE_FLAGS) \
-	-y $(PRIVATE_KEY) \
-	$(SOURCES) -r
+	@$(MONKEYC) --warn -e --output bin/$(APPNAME).iq \
+	-f monkey.jungle \
+	-y $(PRIVATE_KEY) -r
