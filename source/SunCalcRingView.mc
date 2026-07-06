@@ -65,6 +65,8 @@ class SunCalcRingView extends Ui.View {
 
     var sc;
     var now;
+    var ref;        // moment the ring is drawn for (now + dayOffset days)
+    var dayOffset;  // 0 = today; up/down step it
     var lastLoc;
     var is24Hour;
     var fgColor; // foreground, follows the dark/light theme
@@ -73,9 +75,21 @@ class SunCalcRingView extends Ui.View {
         View.initialize();
         sc = new SunCalc();
         now = Time.now();
+        ref = now;
+        dayOffset = 0;
         lastLoc = null;
         is24Hour = Sys.getDeviceSettings().is24Hour;
         fgColor = Gfx.COLOR_WHITE;
+    }
+
+    function nextDay() {
+        dayOffset++;
+        Ui.requestUpdate();
+    }
+
+    function prevDay() {
+        dayOffset--;
+        Ui.requestUpdate();
     }
 
     // Acquire the position every time the view appears (also when
@@ -85,6 +99,7 @@ class SunCalcRingView extends Ui.View {
     // alone is unreliable - if it never delivers, the view is stuck on
     // "Waiting for GPS".
     function onShow() {
+        dayOffset = 0; // always reappear on today
         var info = Pos.getInfo();
         if (info != null && info.position != null
             && info.accuracy != Pos.QUALITY_NOT_AVAILABLE) {
@@ -121,7 +136,7 @@ class SunCalcRingView extends Ui.View {
         dc.setColor(RING_NIGHT, Gfx.COLOR_TRANSPARENT);
         dc.drawCircle(cx, cy, r);
 
-        var segs = ringSegments(sc, now, lastLoc);
+        var segs = ringSegments(sc, ref, lastLoc);
         for (var i = 0; i < segs.size(); i++) {
             var seg = segs[i];
             if (seg == null) {
@@ -140,7 +155,7 @@ class SunCalcRingView extends Ui.View {
 
         // solar noon (black, on the lit side) and solar midnight (light, on
         // the night side) as radial ticks across the band, for orientation
-        var noon = sc.calculate(now, lastLoc, NOON);
+        var noon = sc.calculate(ref, lastLoc, NOON);
         if (noon != null) {
             var noonF = ringDayFrac(noon);
             var midF = noonF + 0.5;
@@ -150,11 +165,13 @@ class SunCalcRingView extends Ui.View {
             drawTick(dc, cx, cy, fracToDeg(midF), r - pen / 2, r + pen / 2, Gfx.COLOR_LT_GRAY);
         }
 
-        // current time marker
-        dc.setPenWidth(pen + 4);
-        dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-        var nowDeg = fracToDeg(ringDayFrac(now));
-        dc.drawArc(cx, cy, r, Gfx.ARC_CLOCKWISE, nowDeg + 2, nowDeg - 2);
+        // current time marker - only meaningful on today
+        if (dayOffset == 0) {
+            dc.setPenWidth(pen + 4);
+            dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
+            var nowDeg = fracToDeg(ringDayFrac(now));
+            dc.drawArc(cx, cy, r, Gfx.ARC_CLOCKWISE, nowDeg + 2, nowDeg - 2);
+        }
 
         // hour marks inside the ring
         dc.setPenWidth(1);
@@ -205,12 +222,22 @@ class SunCalcRingView extends Ui.View {
         }
 
         now = Time.now();
+        ref = (dayOffset == 0)
+            ? now
+            : new Time.Moment(now.value() + dayOffset * Time.Gregorian.SECONDS_PER_DAY);
         drawRing(dc, w, h);
         drawSun(dc, w / 2, (h * 23) / 100, w / 40 + 2);
 
+        // "Today" on the current day, otherwise the day's date (DD.MM.)
+        var head;
+        if (dayOffset == 0) {
+            head = Ui.loadResource(Rez.Strings.Today);
+        } else {
+            var di = Time.Gregorian.info(ref, Time.FORMAT_SHORT);
+            head = di.day.format("%02d") + "." + di.month.format("%02d") + ".";
+        }
         dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, (h * 32) / 100, Gfx.FONT_XTINY,
-                    Ui.loadResource(Rez.Strings.Today),
+        dc.drawText(w / 2, (h * 32) / 100, Gfx.FONT_XTINY, head,
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
 
         // two user-selectable topic rows (defaults: Sunrise/Sunset, Civil)
@@ -232,13 +259,13 @@ class SunCalcRingView extends Ui.View {
         dc.drawText(w / 2, (h * yTitle) / 100, Gfx.FONT_XTINY,
                     Ui.loadResource(titleRes[topicIdx]),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        var am = sc.calculate(now, lastLoc, t[T_AM]);
-        var pm = sc.calculate(now, lastLoc, t[T_PM]);
+        var am = sc.calculate(ref, lastLoc, t[T_AM]);
+        var pm = sc.calculate(ref, lastLoc, t[T_PM]);
         dc.drawText((w * 32) / 100, (h * yTime) / 100, font,
-                    sc.momentToString(am, is24Hour),
+                    sc.momentToString(am, is24Hour, false),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
         dc.drawText((w * 68) / 100, (h * yTime) / 100, font,
-                    sc.momentToString(pm, is24Hour),
+                    sc.momentToString(pm, is24Hour, false),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 }
@@ -266,8 +293,25 @@ class SunCalcRingDelegate extends Ui.BehaviorDelegate {
         var k = key.getKey();
         if (k == Ui.KEY_ENTER || k == Ui.KEY_START || k == Ui.KEY_RIGHT) {
             return openPager();
+        } else if (k == Ui.KEY_DOWN) {
+            view.nextDay();
+            return true;
+        } else if (k == Ui.KEY_UP) {
+            view.prevDay();
+            return true;
         }
         return BehaviorDelegate.onKey(key);
+    }
+
+    // up/down (buttons or swipe) step the day; down = next, up = previous
+    function onNextPage() {
+        view.nextDay();
+        return true;
+    }
+
+    function onPreviousPage() {
+        view.prevDay();
+        return true;
     }
 
     function onTap(event) {

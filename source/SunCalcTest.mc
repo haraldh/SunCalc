@@ -361,5 +361,5 @@ function testTopics(logger) {
 (:test)
 function testMomentToStringNull(logger) {
     var sc = new SunCalc();
-    return sc.momentToString(null, true).equals("--:--");
+    return sc.momentToString(null, true, true).equals("--:--");
 }

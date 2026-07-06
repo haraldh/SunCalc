@@ -95,7 +95,9 @@ class SunCalc {
         return fromJulian(Jrise);
     }
 
-    function momentToString(moment, is24Hour) {
+    // withDay appends a " +N"/" -N" day offset relative to today; pass false
+    // when the caller already shows the date (e.g. the ring's day view).
+    function momentToString(moment, is24Hour, withDay) {
 
         if (moment == null) {
             return "--:--";
@@ -120,6 +122,9 @@ class SunCalc {
             } else {
                 text = text + " PM";
             }
+        }
+        if (!withDay) {
+            return text;
         }
         var today = Time.today();
         // floor() so a moment yesterday at 23:00 is day -1, not 0

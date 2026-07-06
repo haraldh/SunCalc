@@ -196,9 +196,9 @@ class SunCalcGlanceView extends Ui.GlanceView {
         var tRise = sc.calculate(now, loc, topic[T_AM]);
         var tSet = sc.calculate(now, loc, topic[T_PM]);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(barX, (h * 84) / 100, font, sc.momentToString(tRise, is24),
+        dc.drawText(barX, (h * 84) / 100, font, sc.momentToString(tRise, is24, false),
                     Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(w - 1, (h * 84) / 100, font, sc.momentToString(tSet, is24),
+        dc.drawText(w - 1, (h * 84) / 100, font, sc.momentToString(tSet, is24, false),
                     Gfx.TEXT_JUSTIFY_RIGHT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 }

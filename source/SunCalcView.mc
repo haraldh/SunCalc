@@ -328,8 +328,8 @@ class SunCalcView extends Ui.View {
 
         mTitle = periodTitle(mDI);
         var fromTo = getFromTo();
-        mFrom = sc.momentToString(fromTo[0], is24Hour);
-        mTo = sc.momentToString(fromTo[1], is24Hour);
+        mFrom = sc.momentToString(fromTo[0], is24Hour, true);
+        mTo = sc.momentToString(fromTo[1], is24Hour, true);
         mShowDash = true;
 
         Ui.requestUpdate();
