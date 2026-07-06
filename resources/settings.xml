@@ -4,6 +4,10 @@
     <property id="ringTop" type="number">0</property>
     <property id="ringBottom" type="number">1</property>
     <property id="glanceTopic" type="number">0</property>
+    <!-- last known position (radians), saved by the app for the glance to
+         fall back on; 999 = unset. Not exposed in the settings UI. -->
+    <property id="lastLat" type="float">999.0</property>
+    <property id="lastLng" type="float">999.0</property>
     <property id="showNight" type="boolean">true</property>
     <property id="showMorning" type="boolean">true</property>
     <property id="showAfternoon" type="boolean">true</property>

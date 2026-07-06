@@ -6,26 +6,37 @@ using Toybox.Math as Math;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 
-// D_TITLE is a localized string resource id. These render in FONT_LARGE, so
-// the translations use short Garmin-style abbreviations (e.g. "So.unt." for
-// Sonnenuntergang) to stay within the ~11 char English envelope.
+// D_TITLE is null here on purpose: the row title is a localized resource
+// loaded at draw time by periodTitle(rowIndex). A module global initialized
+// with Rez.Strings would crash the glance process (which has no Rez) at load.
 var DISPLAY as Lang.Array<Lang.Array> = [
-    [ Rez.Strings.pAstroDawn, ASTRO_DAWN, NAUTIC_DAWN, :Astro, :AM, "showAstroDawn", null],
-    [ Rez.Strings.pNauticDawn, NAUTIC_DAWN, DAWN, :Nautic, :AM, "showNauticDawn", null],
-    [ Rez.Strings.pBlueDawn, DAWN, BLUE_HOUR_AM, :Blue, :AM, "showBlueDawn", null],
-    [ Rez.Strings.pCivilDawn, DAWN, SUNRISE, :Civil, :AM, "showDawn", null],
-    [ Rez.Strings.pSunrise, SUNRISE, SUNRISE_END, :Sunrise, :AM, "showSunrise", null],
-    [ Rez.Strings.pGoldenDawn, BLUE_HOUR_AM, GOLDEN_HOUR_AM, :Golden, :AM, "showGoldenDawn", null],
-    [ Rez.Strings.pMorning, SUNRISE, NOON, :Noon, :AM, "showMorning", null],
-    [ Rez.Strings.pAfternoon, NOON, SUNSET, :Noon, :PM, "showAfternoon", null],
-    [ Rez.Strings.pGoldenDusk, GOLDEN_HOUR_PM, BLUE_HOUR_PM, :Golden, :PM, "showGoldenDusk", null],
-    [ Rez.Strings.pSunset, SUNSET_START, SUNSET, :Sunrise, :PM, "showSunset", null],
-    [ Rez.Strings.pCivilDusk, SUNSET, DUSK, :Civil, :PM, "showDusk", null],
-    [ Rez.Strings.pBlueDusk, BLUE_HOUR_PM, DUSK, :Blue, :PM, "showBlueDusk", null],
-    [ Rez.Strings.pNauticDusk, DUSK, NAUTIC_DUSK, :Nautic, :PM, "showNauticDusk", null],
-    [ Rez.Strings.pAstroDusk, NAUTIC_DUSK, ASTRO_DUSK, :Astro, :PM, "showAstroDusk", null],
-    [ Rez.Strings.pNight, ASTRO_DUSK, ASTRO_DUSK+1, :Night, :PM, "showNight", null]
+    [ null, ASTRO_DAWN, NAUTIC_DAWN, :Astro, :AM, "showAstroDawn", null],
+    [ null, NAUTIC_DAWN, DAWN, :Nautic, :AM, "showNauticDawn", null],
+    [ null, DAWN, BLUE_HOUR_AM, :Blue, :AM, "showBlueDawn", null],
+    [ null, DAWN, SUNRISE, :Civil, :AM, "showDawn", null],
+    [ null, SUNRISE, SUNRISE_END, :Sunrise, :AM, "showSunrise", null],
+    [ null, BLUE_HOUR_AM, GOLDEN_HOUR_AM, :Golden, :AM, "showGoldenDawn", null],
+    [ null, SUNRISE, NOON, :Noon, :AM, "showMorning", null],
+    [ null, NOON, SUNSET, :Noon, :PM, "showAfternoon", null],
+    [ null, GOLDEN_HOUR_PM, BLUE_HOUR_PM, :Golden, :PM, "showGoldenDusk", null],
+    [ null, SUNSET_START, SUNSET, :Sunrise, :PM, "showSunset", null],
+    [ null, SUNSET, DUSK, :Civil, :PM, "showDusk", null],
+    [ null, BLUE_HOUR_PM, DUSK, :Blue, :PM, "showBlueDusk", null],
+    [ null, DUSK, NAUTIC_DUSK, :Nautic, :PM, "showNauticDusk", null],
+    [ null, NAUTIC_DUSK, ASTRO_DUSK, :Astro, :PM, "showAstroDusk", null],
+    [ null, ASTRO_DUSK, ASTRO_DUSK+1, :Night, :PM, "showNight", null]
     ];
+
+// localized FONT_LARGE period title for DISPLAY row i (short abbreviations
+// in translations to fit the font); Rez is only touched here, at draw time.
+function periodTitle(i) {
+    var res = [ Rez.Strings.pAstroDawn, Rez.Strings.pNauticDawn, Rez.Strings.pBlueDawn,
+                Rez.Strings.pCivilDawn, Rez.Strings.pSunrise, Rez.Strings.pGoldenDawn,
+                Rez.Strings.pMorning, Rez.Strings.pAfternoon, Rez.Strings.pGoldenDusk,
+                Rez.Strings.pSunset, Rez.Strings.pCivilDusk, Rez.Strings.pBlueDusk,
+                Rez.Strings.pNauticDusk, Rez.Strings.pAstroDusk, Rez.Strings.pNight ];
+    return Ui.loadResource(res[i]);
+}
 
 var NO_DISPLAY = false;
 
@@ -315,7 +326,7 @@ class SunCalcView extends Ui.View {
             return;
         }
 
-        mTitle = Ui.loadResource(DISPLAY[mDI][D_TITLE]);
+        mTitle = periodTitle(mDI);
         var fromTo = getFromTo();
         mFrom = sc.momentToString(fromTo[0], is24Hour);
         mTo = sc.momentToString(fromTo[1], is24Hour);

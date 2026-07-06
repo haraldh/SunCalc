@@ -49,21 +49,27 @@ function topicFor(key, def) {
 // Persist the last good position (radians) so the glance can still show data
 // when the device's own cached GPS fix is stale or unavailable - the glance
 // only reads Pos.getInfo() and never acquires a fix itself.
+//
+// Uses Properties, not Storage: the glance process can read Properties (see
+// getConfig) but Application.Storage is not available there and crashes it.
+// lastLat/lastLng are declared in settings.xml with an out-of-range sentinel
+// default so an unset value is distinguishable from a real fix.
 function saveLoc(loc) {
     try {
-        App.Storage.setValue("lastLat", loc[0]);
-        App.Storage.setValue("lastLng", loc[1]);
+        App.Properties.setValue("lastLat", loc[0]);
+        App.Properties.setValue("lastLng", loc[1]);
     } catch (e) {
     }
 }
 
-// [lat, lng] in radians from storage, or null if never saved.
+// [lat, lng] in radians from the last saved fix, or null if none.
 (:glance)
 function loadStoredLoc() {
     try {
-        var lat = App.Storage.getValue("lastLat");
-        var lng = App.Storage.getValue("lastLng");
-        if (lat != null && lng != null) {
+        var lat = App.Properties.getValue("lastLat");
+        var lng = App.Properties.getValue("lastLng");
+        // valid latitude in radians is within +/- pi/2; the sentinel is 999
+        if (lat != null && lng != null && lat >= -2.0 && lat <= 2.0) {
             return [lat, lng];
         }
     } catch (e) {
