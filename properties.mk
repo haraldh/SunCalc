@@ -8,4 +8,4 @@ else
 SDK_HOME ?= $(shell cat $(HOME)/.Garmin/ConnectIQ/current-sdk.cfg)
 endif
 DEPLOY ?= /run/media/$(USER)/GARMIN/GARMIN/APPS
-PRIVATE_KEY ?= $(HOME)/.id_rsa_garmin.der_suncalc
+PRIVATE_KEY ?= $(HOME)/.id_rsa_garmin.der

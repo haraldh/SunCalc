@@ -1,11 +1,12 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Position as Pos;
+using Toybox.Lang;
 using Toybox.Time as Time;
 using Toybox.Math as Math;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 
-var DISPLAY = [
+var DISPLAY as Lang.Array<Lang.Array> = [
     [ "Astr. Dawn", ASTRO_DAWN, NAUTIC_DAWN, :Astro, :AM, "showAstroDawn", null],
     [ "Nautic Dawn", NAUTIC_DAWN, DAWN, :Nautic, :AM, "showNauticDawn", null],
     [ "Blue Hour", DAWN, BLUE_HOUR_AM, :Blue, :AM, "showBlueDawn", null],
@@ -68,15 +69,15 @@ class SunCalcView extends Ui.View {
         var info = Pos.getInfo();
         if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
             Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:setPosition));
-            findDrawableById("what").setText("Waiting for GPS");
-            findDrawableById("time_from").setText("");
-            findDrawableById("time_to").setText("");
+            (findDrawableById("what") as Ui.Text).setText("Waiting for GPS");
+            (findDrawableById("time_from") as Ui.Text).setText("");
+            (findDrawableById("time_to") as Ui.Text).setText("");
         } else {
             setPosition(info);
         }
     }
 
-    function setPosition(info) {
+    function setPosition(info as Pos.Info) as Void {
 
         if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
             return;
@@ -207,27 +208,26 @@ class SunCalcView extends Ui.View {
 
     //! Update the view
     function myUpdate() {
-        var text;
         if (!hasLayout) {
             return;
         }
         if (lastLoc == null) {
-            findDrawableById("what").setText(Rez.Strings.WaitingForGPS);
-            findDrawableById("time_from").setText("");
-            findDrawableById("time_to").setText("");
+            (findDrawableById("what") as Ui.Text).setText(Rez.Strings.WaitingForGPS);
+            (findDrawableById("time_from") as Ui.Text).setText("");
+            (findDrawableById("time_to") as Ui.Text).setText("");
             Ui.requestUpdate();
             return;
         }
 
         if (NO_DISPLAY) {
-            findDrawableById("what").setText("");
-            findDrawableById("time_from").setText(Rez.Strings.NothingToDisplay);
-            findDrawableById("time_to").setText(Rez.Strings.PressMenu);
+            (findDrawableById("what") as Ui.Text).setText("");
+            (findDrawableById("time_from") as Ui.Text).setText(Rez.Strings.NothingToDisplay);
+            (findDrawableById("time_to") as Ui.Text).setText(Rez.Strings.PressMenu);
             Ui.requestUpdate();
             return;
         }
 
-        findDrawableById("what").setText(DISPLAY[mDI][D_TITLE]);
+        (findDrawableById("what") as Ui.Text).setText(DISPLAY[mDI][D_TITLE]);
         var from = getMoment(DISPLAY[mDI][D_FROM]);
         var to = getMoment(DISPLAY[mDI][D_TO]);
 
@@ -243,8 +243,8 @@ class SunCalcView extends Ui.View {
             to = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
         }
 
-        findDrawableById("time_from").setText(sc.momentToString(from, is24Hour));
-        findDrawableById("time_to").setText(sc.momentToString(to, is24Hour));
+        (findDrawableById("time_from") as Ui.Text).setText(sc.momentToString(from, is24Hour));
+        (findDrawableById("time_to") as Ui.Text).setText(sc.momentToString(to, is24Hour));
 
         Ui.requestUpdate();
     }
@@ -285,7 +285,7 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
         return true;
     }
 
-    function onPosition(info) {
+    function onPosition(info as Pos.Info) as Void {
         if (view) {
             view.setPosition(info);
         }
@@ -347,7 +347,6 @@ class SunCalcDelegate extends Ui.BehaviorDelegate {
             }
 
             var coordinate = event.getCoordinates();
-            var event_x = coordinate[0];
             var event_y = coordinate[1];
             if (event_y <= view.thirdHeight) {
                 onPreviousPage();

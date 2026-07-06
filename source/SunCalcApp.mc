@@ -25,7 +25,7 @@ class SunCalcApp extends App.AppBase {
         return [ view, new SunCalcDelegate(view, false) ];
     }
 
-    function onSettingsChanged(object) {
+    function onSettingsChanged() {
         for (var i = 0; i < DISPLAY.size(); i++) {
            DISPLAY[i][D_SHOW] = getPropertyDef(DISPLAY[i][D_PROP], true);
         }

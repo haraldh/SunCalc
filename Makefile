@@ -5,8 +5,7 @@ SOURCES = $(shell find source -name '[^.]*.mc')
 RESFILES = $(shell find resources* -name '[^.]*.xml')
 APPNAME = $(shell grep entry manifest.xml | sed 's/.*entry="\([^"]*\).*/\1/' | sed 's/App$$//')
 SIMULATOR = LD_LIBRARY_PATH="$(SDK_HOME)/bin" "$(SDK_HOME)/bin/connectiq"
-# -l 0: the sources predate the monkeyc type checker and don't pass it
-MONKEYC = "$(SDK_HOME)/bin/monkeyc" -l 0
+MONKEYC = "$(SDK_HOME)/bin/monkeyc"
 MONKEYDO = "$(SDK_HOME)/bin/monkeydo"
 
 .PHONY: all build buildall deploy run test sim simcheck package clean printdevices printsupported

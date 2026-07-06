@@ -1,6 +1,7 @@
 using Toybox.Math as Math;
 using Toybox.Time as Time;
 using Toybox.Position as Pos;
+using Toybox.Lang;
 
 class SunCalc {
 
@@ -51,7 +52,7 @@ class SunCalc {
     }
 
     // lat and lng in radians
-    function calculate(moment, pos, what) {
+    function calculate(moment, pos as Lang.Array<Lang.Double>, what) {
         var lat = pos[0];
         var lng = pos[1];
 
