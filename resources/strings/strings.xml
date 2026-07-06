@@ -1,7 +1,6 @@
 <strings>
     <string id="AppName">SunCalc</string>
     <string id="AppVersion">V11</string>
-    <string id="dash">-</string>
     <string id="WaitingForGPS">Waiting for GPS</string>
     <string id="NothingToDisplay">Nothing to Display</string>
     <string id="PressMenu">Press Menu</string>
@@ -26,7 +25,4 @@
     <string id="MenuNoon">Morning/Afternoon</string>
     <string id="Show">Show</string>
     <string id="Today">TODAY</string>
-    <string id="Sunrise">SUNRISE</string>
-    <string id="Sunset">SUNSET</string>
-    <string id="Twilight">TWILIGHT</string>
 </strings>

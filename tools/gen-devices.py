@@ -9,11 +9,12 @@ a widget (natively, or as a super app on CIQ >= 4) and rewrites:
   - monkey.jungle           per-device launcher icon resourcePath +
                             excludeAnnotations=hasGlance for devices
                             without glance support
-  - resources-<family>/     layout.xml + drawables.xml scaled from the
-                            round-240x240 template (only if missing)
   - resources-launcher-*/   launcher_icon.png rendered from
                             SunCalc-icon.svg (requires rsvg-convert,
                             e.g. `nix shell nixpkgs#librsvg`)
+
+All views draw themselves in code (resolution independent), so no
+per-family layout/drawable resources are needed.
 
 Run after installing a new SDK / device updates:
   nix shell nixpkgs#librsvg -c python3 tools/gen-devices.py
@@ -45,56 +46,6 @@ def scan():
                          glance="glance" in types))
     return wear
 
-def r(v):
-    return int(round(v))
-
-def gen_family(fam):
-    shape, dims = fam.split("-")
-    W, H = map(int, dims.split("x"))
-    sx, sy = W / 240.0, H / 240.0
-    # 1-bit displays dither gray away
-    bar_color = "Gfx.COLOR_BLACK" if shape == "semioctagon" else "Gfx.COLOR_DK_GRAY"
-    d = os.path.join(REPO, f"resources-{fam}")
-    os.makedirs(os.path.join(d, "drawables"), exist_ok=True)
-    os.makedirs(os.path.join(d, "layouts"), exist_ok=True)
-    cx = W // 2
-    aw, ah, top = r(11 * sx), r(10 * sy), r(5 * sy)
-    bot = H - top
-    ax, ay = r(115 * sx), r(15 * sy)
-    with open(os.path.join(d, "drawables", "drawables.xml"), "w") as f:
-        f.write(f'''<drawables>
-		<drawable-list id="Arrow_updown">
-			<shape type="polygon" points="[[{cx},{top}], [{cx-aw},{top+ah}], [{cx+aw},{top+ah}]]" color="Gfx.COLOR_BLACK" />
-			<shape type="polygon" points="[[{cx},{bot}], [{cx-aw},{bot-ah}], [{cx+aw},{bot-ah}]]" color="Gfx.COLOR_BLACK" />
-		</drawable-list>
-		<drawable-list id="Arrow_right">
-			<shape type="polygon" points="[[{ax},{ay}], [{ax},{ay+r(20*sy)}], [{ax+r(10*sx)},{ay+r(10*sy)}]]" color="Gfx.COLOR_BLACK" />
-		</drawable-list>
-
-	    <drawable-list id="gray_horizontal_up_bar">
-	    	<shape type="rectangle" color="{bar_color}" x="0" y="{r(45*sy)}" width="fill" height="2" />
-	    </drawable-list>
-	    <drawable-list id="gray_horizontal_down_bar">
-	    	<shape type="rectangle" color="{bar_color}" x="0" y="{r(195*sy)}" width="fill" height="2" />
-	    </drawable-list>
-	    <drawable-list id="white_background">
-	        <shape type="rectangle" color="Gfx.COLOR_WHITE" x="0" y="0" width="fill" height="fill" />
-	    </drawable-list>
-</drawables>
-''')
-    with open(os.path.join(d, "layouts", "layout.xml"), "w") as f:
-        f.write(f'''<layout id="MainLayout">
-	<drawable id="white_background" />
-	<drawable id="gray_horizontal_up_bar" />
-	<drawable id="gray_horizontal_down_bar" />
-
-	<label id="what"      x="center" y="{r(50*sy)}"  font="Gfx.FONT_LARGE" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label id="time_from" x="center" y="{r(100*sy)}" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label text="@Strings.dash"       x="center" y="{r(120*sy)}" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-	<label id="time_to"   x="center" y="{r(140*sy)}" font="Gfx.FONT_MEDIUM" color="Gfx.COLOR_BLACK" justification="Gfx.TEXT_JUSTIFY_CENTER" />
-</layout>
-''')
-
 def gen_launcher(size):
     d = os.path.join(REPO, f"resources-launcher-{size}")
     os.makedirs(os.path.join(d, "drawables"), exist_ok=True)
@@ -115,10 +66,6 @@ def main():
     wear = scan()
     print(f"{len(wear)} wearable devices")
 
-    for fam in sorted({w["fam"] for w in wear}):
-        if not os.path.isdir(os.path.join(REPO, f"resources-{fam}")):
-            gen_family(fam)
-            print(f"new family {fam}")
     for size in sorted({w["launcher"] for w in wear}):
         gen_launcher(size)
 
