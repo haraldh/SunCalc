@@ -1,0 +1,70 @@
+<strings>
+    <!-- brand strings (AppName/AppVersion) live only in the base file -->
+    <string id="WaitingForGPS">Attesa GPS</string>
+    <string id="NothingToDisplay">Niente da mostrare</string>
+    <string id="PressMenu">Premi Menu</string>
+    <string id="Today">OGGI</string>
+
+    <string id="pAstroDawn">Astr. matt.</string>
+    <string id="pNauticDawn">Naut. matt.</string>
+    <string id="pBlueDawn">Ora blu m.</string>
+    <string id="pCivilDawn">Civ. matt.</string>
+    <string id="pSunrise">Alba</string>
+    <string id="pGoldenDawn">Ora oro m.</string>
+    <string id="pMorning">Mattina</string>
+    <string id="pAfternoon">Pomeriggio</string>
+    <string id="pGoldenDusk">Ora oro s.</string>
+    <string id="pSunset">Tramonto</string>
+    <string id="pCivilDusk">Civ. sera</string>
+    <string id="pBlueDusk">Ora blu s.</string>
+    <string id="pNauticDusk">Naut. sera</string>
+    <string id="pAstroDusk">Astr. sera</string>
+    <string id="pNight">Notte</string>
+
+    <string id="SettingsMenuTitleAMPM">Mattina/Pom.</string>
+    <string id="MenuBack">Indietro</string>
+    <string id="MenuOn">Attivo</string>
+    <string id="MenuOff">Disattivo</string>
+    <string id="MenuAM">Mattina</string>
+    <string id="MenuPM">Pomeriggio</string>
+    <string id="MenuAMOn">Mattina – Attivo</string>
+    <string id="MenuPMOn">Pomeriggio – Attivo</string>
+    <string id="MenuAMOff">Mattina – Disattivo</string>
+    <string id="MenuPMOff">Pomeriggio – Disattivo</string>
+    <string id="SettingsMenuTitle">Mostra</string>
+    <string id="MenuNight">Notte</string>
+    <string id="MenuAstro">Crep. astronomico</string>
+    <string id="MenuNautic">Crep. nautico</string>
+    <string id="MenuBlue">Ora blu</string>
+    <string id="MenuCivil">Crep. civile</string>
+    <string id="MenuSunrise">Alba/Tramonto</string>
+    <string id="MenuGolden">Ora d'oro</string>
+    <string id="MenuNoon">Mattina/Pomeriggio</string>
+    <string id="Show">Mostra</string>
+
+    <string id="darkModeTitle">Tema scuro (bianco su nero)</string>
+    <string id="ringTopTitle">Anello: riga sup.</string>
+    <string id="ringBottomTitle">Anello: riga inf.</string>
+    <string id="glanceTopicTitle">Tema glance</string>
+    <string id="topicSun">Alba/Tramonto</string>
+    <string id="topicCivil">Crep. civile</string>
+    <string id="topicNautic">Crep. nautico</string>
+    <string id="topicAstro">Crep. astron.</string>
+    <string id="topicBlue">Ora blu</string>
+    <string id="topicGolden">Ora d'oro</string>
+    <string id="showNightTitle">Mostra notte</string>
+    <string id="showMorningTitle">Mostra mattina</string>
+    <string id="showAfternoonTitle">Mostra pomeriggio</string>
+    <string id="showAstroDawnTitle">Mostra crep. astronomico mattutino</string>
+    <string id="showNauticDawnTitle">Mostra crep. nautico mattutino</string>
+    <string id="showDawnTitle">Mostra crep. mattutino</string>
+    <string id="showBlueDawnTitle">Mostra ora blu mattutina</string>
+    <string id="showGoldenDawnTitle">Mostra ora d'oro mattutina</string>
+    <string id="showAstroDuskTitle">Mostra crep. astronomico serale</string>
+    <string id="showNauticDuskTitle">Mostra crep. nautico serale</string>
+    <string id="showDuskTitle">Mostra crep. serale</string>
+    <string id="showBlueDuskTitle">Mostra ora blu serale</string>
+    <string id="showGoldenDuskTitle">Mostra ora d'oro serale</string>
+    <string id="showSunriseTitle">Mostra alba</string>
+    <string id="showSunsetTitle">Mostra tramonto</string>
+</strings>

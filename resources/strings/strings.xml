@@ -25,4 +25,21 @@
     <string id="MenuNoon">Morning/Afternoon</string>
     <string id="Show">Show</string>
     <string id="Today">TODAY</string>
+
+    <!-- pager period titles (FONT_LARGE): keep short, abbreviate in translations -->
+    <string id="pAstroDawn">Astr. Dawn</string>
+    <string id="pNauticDawn">Nautic Dawn</string>
+    <string id="pBlueDawn">Blue Hour</string>
+    <string id="pCivilDawn">Civil Dawn</string>
+    <string id="pSunrise">Sunrise</string>
+    <string id="pGoldenDawn">Golden Hour</string>
+    <string id="pMorning">Morning</string>
+    <string id="pAfternoon">Afternoon</string>
+    <string id="pGoldenDusk">Golden Hour</string>
+    <string id="pSunset">Sunset</string>
+    <string id="pCivilDusk">Civil Dusk</string>
+    <string id="pBlueDusk">Blue Hour</string>
+    <string id="pNauticDusk">Nautic Dusk</string>
+    <string id="pAstroDusk">Astr. Dusk</string>
+    <string id="pNight">Night</string>
 </strings>

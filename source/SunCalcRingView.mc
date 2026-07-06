@@ -27,6 +27,13 @@ var RING_BANDS as Lang.Array<Lang.Array> = [
 
 var RING_NIGHT = 0x000055;
 
+// localized ring-row titles, indexed like TOPICS (main-app only, so it may
+// use Rez unlike the glance). Kept in step with the TOPICS order.
+var RING_TITLE_RES as Lang.Array = [
+    Rez.Strings.topicSun, Rez.Strings.topicCivil, Rez.Strings.topicNautic,
+    Rez.Strings.topicAstro, Rez.Strings.topicBlue, Rez.Strings.topicGolden
+];
+
 // fraction of the local day [0..1) for a moment
 function ringDayFrac(moment) {
     var t = Time.Gregorian.info(moment, Time.FORMAT_SHORT);
@@ -224,7 +231,7 @@ class SunCalcRingView extends Ui.View {
         var h = dc.getHeight();
         dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
         dc.drawText(w / 2, (h * yTitle) / 100, Gfx.FONT_XTINY,
-                    t[T_TITLE] as Lang.String,
+                    Ui.loadResource(RING_TITLE_RES[topicIdx]),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
         var am = sc.calculate(now, lastLoc, t[T_AM]);
         var pm = sc.calculate(now, lastLoc, t[T_PM]);

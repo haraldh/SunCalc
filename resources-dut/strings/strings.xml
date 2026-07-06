@@ -1,0 +1,70 @@
+<strings>
+    <!-- brand strings (AppName/AppVersion) live only in the base file -->
+    <string id="WaitingForGPS">Wachten op GPS</string>
+    <string id="NothingToDisplay">Niets te tonen</string>
+    <string id="PressMenu">Druk op Menu</string>
+    <string id="Today">VANDAAG</string>
+
+    <string id="pAstroDawn">Astr. ocht.</string>
+    <string id="pNauticDawn">Naut. ocht.</string>
+    <string id="pBlueDawn">Blauw uur</string>
+    <string id="pCivilDawn">Ochtend.</string>
+    <string id="pSunrise">Zon op.</string>
+    <string id="pGoldenDawn">Goud. uur</string>
+    <string id="pMorning">Voormidd.</string>
+    <string id="pAfternoon">Namiddag</string>
+    <string id="pGoldenDusk">Goud. uur</string>
+    <string id="pSunset">Zon ond.</string>
+    <string id="pCivilDusk">Avond.</string>
+    <string id="pBlueDusk">Blauw uur</string>
+    <string id="pNauticDusk">Naut. av.</string>
+    <string id="pAstroDusk">Astr. av.</string>
+    <string id="pNight">Nacht</string>
+
+    <string id="SettingsMenuTitleAMPM">Voor-/Namiddag</string>
+    <string id="MenuBack">Terug</string>
+    <string id="MenuOn">Aan</string>
+    <string id="MenuOff">Uit</string>
+    <string id="MenuAM">Voormiddag</string>
+    <string id="MenuPM">Namiddag</string>
+    <string id="MenuAMOn">Voormiddag – Aan</string>
+    <string id="MenuPMOn">Namiddag – Aan</string>
+    <string id="MenuAMOff">Voormiddag – Uit</string>
+    <string id="MenuPMOff">Namiddag – Uit</string>
+    <string id="SettingsMenuTitle">Weergeven</string>
+    <string id="MenuNight">Nacht</string>
+    <string id="MenuAstro">Astron. schemering</string>
+    <string id="MenuNautic">Naut. schemering</string>
+    <string id="MenuBlue">Blauwe uur</string>
+    <string id="MenuCivil">Burgerl. schemering</string>
+    <string id="MenuSunrise">Op-/Ondergang</string>
+    <string id="MenuGolden">Gouden uur</string>
+    <string id="MenuNoon">Voor-/Namiddag</string>
+    <string id="Show">Weergeven</string>
+
+    <string id="darkModeTitle">Donker thema (wit op zwart)</string>
+    <string id="ringTopTitle">Ring: bovenste rij</string>
+    <string id="ringBottomTitle">Ring: onderste rij</string>
+    <string id="glanceTopicTitle">Glance-thema</string>
+    <string id="topicSun">Op-/Ondergang</string>
+    <string id="topicCivil">Burgerl. schem.</string>
+    <string id="topicNautic">Naut. schem.</string>
+    <string id="topicAstro">Astron. schem.</string>
+    <string id="topicBlue">Blauwe uur</string>
+    <string id="topicGolden">Gouden uur</string>
+    <string id="showNightTitle">Nacht weergeven</string>
+    <string id="showMorningTitle">Voormiddag weergeven</string>
+    <string id="showAfternoonTitle">Namiddag weergeven</string>
+    <string id="showAstroDawnTitle">Astron. ochtendschemering weergeven</string>
+    <string id="showNauticDawnTitle">Naut. ochtendschemering weergeven</string>
+    <string id="showDawnTitle">Ochtendschemering weergeven</string>
+    <string id="showBlueDawnTitle">Blauwe uur 's ochtends weergeven</string>
+    <string id="showGoldenDawnTitle">Gouden uur 's ochtends weergeven</string>
+    <string id="showAstroDuskTitle">Astron. avondschemering weergeven</string>
+    <string id="showNauticDuskTitle">Naut. avondschemering weergeven</string>
+    <string id="showDuskTitle">Avondschemering weergeven</string>
+    <string id="showBlueDuskTitle">Blauwe uur 's avonds weergeven</string>
+    <string id="showGoldenDuskTitle">Gouden uur 's avonds weergeven</string>
+    <string id="showSunriseTitle">Zonsopkomst weergeven</string>
+    <string id="showSunsetTitle">Zonsondergang weergeven</string>
+</strings>

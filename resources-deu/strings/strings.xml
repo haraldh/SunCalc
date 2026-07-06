@@ -1,0 +1,75 @@
+<strings>
+    <!-- brand strings (AppName/AppVersion) live only in the base file -->
+
+    <!-- status / view -->
+    <string id="WaitingForGPS">Warte auf GPS</string>
+    <string id="NothingToDisplay">Nichts anzuzeigen</string>
+    <string id="PressMenu">Menü drücken</string>
+    <string id="Today">HEUTE</string>
+
+    <!-- pager period titles (FONT_LARGE, keep short) -->
+    <string id="pAstroDawn">Astr. Morg.</string>
+    <string id="pNauticDawn">Naut. Morg.</string>
+    <string id="pBlueDawn">Blaue St.</string>
+    <string id="pCivilDawn">Morgend.</string>
+    <string id="pSunrise">So.aufg.</string>
+    <string id="pGoldenDawn">Gold. St.</string>
+    <string id="pMorning">Vormittag</string>
+    <string id="pAfternoon">Nachmittag</string>
+    <string id="pGoldenDusk">Gold. St.</string>
+    <string id="pSunset">So.unt.</string>
+    <string id="pCivilDusk">Abendd.</string>
+    <string id="pBlueDusk">Blaue St.</string>
+    <string id="pNauticDusk">Naut. Ab.</string>
+    <string id="pAstroDusk">Astr. Ab.</string>
+    <string id="pNight">Nacht</string>
+
+    <!-- menus -->
+    <string id="SettingsMenuTitleAMPM">Vor-/Nachmittag</string>
+    <string id="MenuBack">Zurück</string>
+    <string id="MenuOn">An</string>
+    <string id="MenuOff">Aus</string>
+    <string id="MenuAM">Vormittag</string>
+    <string id="MenuPM">Nachmittag</string>
+    <string id="MenuAMOn">Vormittags – An</string>
+    <string id="MenuPMOn">Nachmittags – An</string>
+    <string id="MenuAMOff">Vormittags – Aus</string>
+    <string id="MenuPMOff">Nachmittags – Aus</string>
+    <string id="SettingsMenuTitle">Anzeigen</string>
+    <string id="MenuNight">Nacht</string>
+    <string id="MenuAstro">Astron. Dämmerung</string>
+    <string id="MenuNautic">Naut. Dämmerung</string>
+    <string id="MenuBlue">Blaue Stunde</string>
+    <string id="MenuCivil">Bürgerl. Dämmerung</string>
+    <string id="MenuSunrise">Auf-/Untergang</string>
+    <string id="MenuGolden">Goldene Stunde</string>
+    <string id="MenuNoon">Vor-/Nachmittag</string>
+    <string id="Show">Anzeigen</string>
+
+    <!-- settings -->
+    <string id="darkModeTitle">Dunkles Design (weiß auf schwarz)</string>
+    <string id="ringTopTitle">Ring: obere Zeile</string>
+    <string id="ringBottomTitle">Ring: untere Zeile</string>
+    <string id="glanceTopicTitle">Glance-Thema</string>
+    <string id="topicSun">Auf-/Untergang</string>
+    <string id="topicCivil">Bürgerl. Dämm.</string>
+    <string id="topicNautic">Naut. Dämm.</string>
+    <string id="topicAstro">Astron. Dämm.</string>
+    <string id="topicBlue">Blaue Stunde</string>
+    <string id="topicGolden">Goldene Stunde</string>
+    <string id="showNightTitle">Nacht anzeigen</string>
+    <string id="showMorningTitle">Vormittag anzeigen</string>
+    <string id="showAfternoonTitle">Nachmittag anzeigen</string>
+    <string id="showAstroDawnTitle">Astron. Morgendämmerung anzeigen</string>
+    <string id="showNauticDawnTitle">Naut. Morgendämmerung anzeigen</string>
+    <string id="showDawnTitle">Morgendämmerung anzeigen</string>
+    <string id="showBlueDawnTitle">Blaue Stunde morgens anzeigen</string>
+    <string id="showGoldenDawnTitle">Goldene Stunde morgens anzeigen</string>
+    <string id="showAstroDuskTitle">Astron. Abenddämmerung anzeigen</string>
+    <string id="showNauticDuskTitle">Naut. Abenddämmerung anzeigen</string>
+    <string id="showDuskTitle">Abenddämmerung anzeigen</string>
+    <string id="showBlueDuskTitle">Blaue Stunde abends anzeigen</string>
+    <string id="showGoldenDuskTitle">Goldene Stunde abends anzeigen</string>
+    <string id="showSunriseTitle">Sonnenaufgang anzeigen</string>
+    <string id="showSunsetTitle">Sonnenuntergang anzeigen</string>
+</strings>

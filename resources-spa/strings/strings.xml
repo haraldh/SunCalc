@@ -1,0 +1,70 @@
+<strings>
+    <!-- brand strings (AppName/AppVersion) live only in the base file -->
+    <string id="WaitingForGPS">Esperando GPS</string>
+    <string id="NothingToDisplay">Nada que mostrar</string>
+    <string id="PressMenu">Pulsa Menú</string>
+    <string id="Today">HOY</string>
+
+    <string id="pAstroDawn">Astr. mañ.</string>
+    <string id="pNauticDawn">Náut. mañ.</string>
+    <string id="pBlueDawn">Hora azul</string>
+    <string id="pCivilDawn">Alba</string>
+    <string id="pSunrise">Amanecer</string>
+    <string id="pGoldenDawn">Hora dor.</string>
+    <string id="pMorning">Mañana</string>
+    <string id="pAfternoon">Tarde</string>
+    <string id="pGoldenDusk">Hora dor.</string>
+    <string id="pSunset">Ocaso</string>
+    <string id="pCivilDusk">Crepúsc.</string>
+    <string id="pBlueDusk">Hora azul</string>
+    <string id="pNauticDusk">Náut. tar.</string>
+    <string id="pAstroDusk">Astr. tar.</string>
+    <string id="pNight">Noche</string>
+
+    <string id="SettingsMenuTitleAMPM">AM o PM</string>
+    <string id="MenuBack">Atrás</string>
+    <string id="MenuOn">Activado</string>
+    <string id="MenuOff">Desactivado</string>
+    <string id="MenuAM">Mañana</string>
+    <string id="MenuPM">Tarde</string>
+    <string id="MenuAMOn">Mañana – Activado</string>
+    <string id="MenuPMOn">Tarde – Activado</string>
+    <string id="MenuAMOff">Mañana – Desactivado</string>
+    <string id="MenuPMOff">Tarde – Desactivado</string>
+    <string id="SettingsMenuTitle">Mostrar</string>
+    <string id="MenuNight">Noche</string>
+    <string id="MenuAstro">Crepúsculo astron.</string>
+    <string id="MenuNautic">Crepúsculo náut.</string>
+    <string id="MenuBlue">Hora azul</string>
+    <string id="MenuCivil">Crepúsculo civil</string>
+    <string id="MenuSunrise">Amanecer/Ocaso</string>
+    <string id="MenuGolden">Hora dorada</string>
+    <string id="MenuNoon">Mañana/Tarde</string>
+    <string id="Show">Mostrar</string>
+
+    <string id="darkModeTitle">Tema oscuro (blanco sobre negro)</string>
+    <string id="ringTopTitle">Anillo: fila superior</string>
+    <string id="ringBottomTitle">Anillo: fila inferior</string>
+    <string id="glanceTopicTitle">Tema del vistazo</string>
+    <string id="topicSun">Amanecer/Ocaso</string>
+    <string id="topicCivil">Crepúsc. civil</string>
+    <string id="topicNautic">Crepúsc. náut.</string>
+    <string id="topicAstro">Crepúsc. astro.</string>
+    <string id="topicBlue">Hora azul</string>
+    <string id="topicGolden">Hora dorada</string>
+    <string id="showNightTitle">Mostrar noche</string>
+    <string id="showMorningTitle">Mostrar mañana</string>
+    <string id="showAfternoonTitle">Mostrar tarde</string>
+    <string id="showAstroDawnTitle">Mostrar crepúsculo astronómico matutino</string>
+    <string id="showNauticDawnTitle">Mostrar crepúsculo náutico matutino</string>
+    <string id="showDawnTitle">Mostrar crepúsculo matutino</string>
+    <string id="showBlueDawnTitle">Mostrar hora azul matutina</string>
+    <string id="showGoldenDawnTitle">Mostrar hora dorada matutina</string>
+    <string id="showAstroDuskTitle">Mostrar crepúsculo astronómico vespertino</string>
+    <string id="showNauticDuskTitle">Mostrar crepúsculo náutico vespertino</string>
+    <string id="showDuskTitle">Mostrar crepúsculo vespertino</string>
+    <string id="showBlueDuskTitle">Mostrar hora azul vespertina</string>
+    <string id="showGoldenDuskTitle">Mostrar hora dorada vespertina</string>
+    <string id="showSunriseTitle">Mostrar amanecer</string>
+    <string id="showSunsetTitle">Mostrar ocaso</string>
+</strings>

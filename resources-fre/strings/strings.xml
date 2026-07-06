@@ -1,0 +1,70 @@
+<strings>
+    <!-- brand strings (AppName/AppVersion) live only in the base file -->
+    <string id="WaitingForGPS">En attente du GPS</string>
+    <string id="NothingToDisplay">Rien à afficher</string>
+    <string id="PressMenu">Appuyer sur Menu</string>
+    <string id="Today">AUJOURD'HUI</string>
+
+    <string id="pAstroDawn">Astr. mat.</string>
+    <string id="pNauticDawn">Naut. mat.</string>
+    <string id="pBlueDawn">H. bleue</string>
+    <string id="pCivilDawn">Aube civ.</string>
+    <string id="pSunrise">Lever</string>
+    <string id="pGoldenDawn">H. dorée</string>
+    <string id="pMorning">Matin</string>
+    <string id="pAfternoon">Après-midi</string>
+    <string id="pGoldenDusk">H. dorée</string>
+    <string id="pSunset">Coucher</string>
+    <string id="pCivilDusk">Crép. civ.</string>
+    <string id="pBlueDusk">H. bleue</string>
+    <string id="pNauticDusk">Naut. soir</string>
+    <string id="pAstroDusk">Astr. soir</string>
+    <string id="pNight">Nuit</string>
+
+    <string id="SettingsMenuTitleAMPM">Matin ou après-midi</string>
+    <string id="MenuBack">Retour</string>
+    <string id="MenuOn">Activé</string>
+    <string id="MenuOff">Désactivé</string>
+    <string id="MenuAM">Matin</string>
+    <string id="MenuPM">Après-midi</string>
+    <string id="MenuAMOn">Matin – Activé</string>
+    <string id="MenuPMOn">Après-midi – Activé</string>
+    <string id="MenuAMOff">Matin – Désactivé</string>
+    <string id="MenuPMOff">Après-midi – Désactivé</string>
+    <string id="SettingsMenuTitle">Afficher</string>
+    <string id="MenuNight">Nuit</string>
+    <string id="MenuAstro">Crép. astronomique</string>
+    <string id="MenuNautic">Crép. nautique</string>
+    <string id="MenuBlue">Heure bleue</string>
+    <string id="MenuCivil">Crép. civil</string>
+    <string id="MenuSunrise">Lever/Coucher</string>
+    <string id="MenuGolden">Heure dorée</string>
+    <string id="MenuNoon">Matin/Après-midi</string>
+    <string id="Show">Afficher</string>
+
+    <string id="darkModeTitle">Thème sombre (blanc sur noir)</string>
+    <string id="ringTopTitle">Anneau : ligne du haut</string>
+    <string id="ringBottomTitle">Anneau : ligne du bas</string>
+    <string id="glanceTopicTitle">Thème du glance</string>
+    <string id="topicSun">Lever / Coucher</string>
+    <string id="topicCivil">Crép. civil</string>
+    <string id="topicNautic">Crép. naut.</string>
+    <string id="topicAstro">Crép. astro.</string>
+    <string id="topicBlue">Heure bleue</string>
+    <string id="topicGolden">Heure dorée</string>
+    <string id="showNightTitle">Afficher la nuit</string>
+    <string id="showMorningTitle">Afficher le matin</string>
+    <string id="showAfternoonTitle">Afficher l'après-midi</string>
+    <string id="showAstroDawnTitle">Afficher l'aube astronomique</string>
+    <string id="showNauticDawnTitle">Afficher l'aube nautique</string>
+    <string id="showDawnTitle">Afficher l'aube</string>
+    <string id="showBlueDawnTitle">Afficher l'heure bleue du matin</string>
+    <string id="showGoldenDawnTitle">Afficher l'heure dorée du matin</string>
+    <string id="showAstroDuskTitle">Afficher le crépuscule astronomique</string>
+    <string id="showNauticDuskTitle">Afficher le crépuscule nautique</string>
+    <string id="showDuskTitle">Afficher le crépuscule</string>
+    <string id="showBlueDuskTitle">Afficher l'heure bleue du soir</string>
+    <string id="showGoldenDuskTitle">Afficher l'heure dorée du soir</string>
+    <string id="showSunriseTitle">Afficher le lever du soleil</string>
+    <string id="showSunsetTitle">Afficher le coucher du soleil</string>
+</strings>
