@@ -135,6 +135,18 @@ class SunCalcRingView extends Ui.View {
             }
         }
 
+        // solar noon (black, on the lit side) and solar midnight (light, on
+        // the night side) as radial ticks across the band, for orientation
+        var noon = sc.calculate(now, lastLoc, NOON);
+        if (noon != null) {
+            var noonF = ringDayFrac(noon);
+            var midF = noonF + 0.5;
+            if (midF >= 1.0) { midF -= 1.0; }
+            dc.setPenWidth(2);
+            drawTick(dc, cx, cy, fracToDeg(noonF), r - pen / 2, r + pen / 2, Gfx.COLOR_BLACK);
+            drawTick(dc, cx, cy, fracToDeg(midF), r - pen / 2, r + pen / 2, Gfx.COLOR_LT_GRAY);
+        }
+
         // current time marker
         dc.setPenWidth(pen + 4);
         dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
@@ -153,6 +165,15 @@ class SunCalcRingView extends Ui.View {
                         font, labels[i],
                         Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
         }
+    }
+
+    // radial tick from radius ri to ro at drawArc-convention degrees
+    hidden function drawTick(dc, cx, cy, deg, ri, ro, color) {
+        var a = deg * Math.PI / 180.0;
+        var ca = Math.cos(a);
+        var sa = Math.sin(a);
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.drawLine(cx + ri * ca, cy - ri * sa, cx + ro * ca, cy - ro * sa);
     }
 
     hidden function drawSun(dc, cx, cy, rad) {
