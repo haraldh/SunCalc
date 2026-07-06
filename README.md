@@ -7,6 +7,8 @@ https://apps.garmin.com/en-US/apps/87b86650-a443-43ea-9dcb-29e4051a5722
 On Connect IQ 4+ devices (fēnix 7 and newer) the widget runs as a super
 app with a glance showing the next sunrise/sunset.
 
+See the **[User Guide](docs/USER_GUIDE.md)** for how to use it, with screenshots.
+
 ## Development
 
 With [Nix](https://nixos.org) and [direnv](https://direnv.net) the dev
