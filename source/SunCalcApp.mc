@@ -3,6 +3,10 @@ using Toybox.Application as App;
 var AB = null;
 
 function getPropertyDef(key, def) {
+    if (AB == null) {
+        // no app instance (unit tests)
+        return def;
+    }
     var val = AB.getProperty(key);
     if (val == null) {
         return def;

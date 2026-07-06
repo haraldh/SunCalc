@@ -100,7 +100,10 @@ class SunCalc {
             return "--:--";
         }
 
-        var tinfo = Time.Gregorian.info(new Time.Moment(moment.value() + 30), Time.FORMAT_SHORT);
+        // Round to the nearest minute; the day offset below must use the
+        // same rounded moment so 23:59:40 shows as "00:00 +1", not "00:00".
+        var rounded = new Time.Moment(moment.value() + 30);
+        var tinfo = Time.Gregorian.info(rounded, Time.FORMAT_SHORT);
         var text;
         if (is24Hour) {
             text = tinfo.hour.format("%02d") + ":" + tinfo.min.format("%02d");
@@ -118,14 +121,12 @@ class SunCalc {
             }
         }
         var today = Time.today();
-        var days = ((moment.value() - today.value()) / Time.Gregorian.SECONDS_PER_DAY).toNumber();
+        // floor() so a moment yesterday at 23:00 is day -1, not 0
+        var days = Math.floor((rounded.value() - today.value()).toDouble() / Time.Gregorian.SECONDS_PER_DAY).toNumber();
 
-        if (moment.value() > today.value() ) {
-            if (days > 0) {
-                text = text + " +" + days;
-            }
-        } else {
-            days = days - 1;
+        if (days > 0) {
+            text = text + " +" + days;
+        } else if (days < 0) {
             text = text + " " + days;
         }
         return text;
@@ -171,7 +172,7 @@ class SunCalc {
                 if (moment == null) {
                     val = "null";
                 } else {
-                    val = moment.value().toLong();
+                    val = (moment as Time.Moment).value().toLong();
                 }
 
                 logger.debug("Expected " + testMatrix[i][4] + " but got: " + val);

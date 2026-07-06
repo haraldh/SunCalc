@@ -1,0 +1,274 @@
+// Unit tests. Run with `make test` (or `nix develop -c make test`).
+//
+// The reference fixtures were pulled from the sunrise-sunset.org API
+// (NOAA-style algorithm, times in UTC, "formatted=0"), e.g.:
+//   https://api.sunrise-sunset.org/json?lat=70.6632359&lng=23.681726&date=2026-09-19&formatted=0
+// Each row is [ anchor, lat, lng, event, expected-epoch-or-null ]. The
+// anchor is the API's solar_noon epoch, which pins calculate() to the same
+// solar day regardless of longitude/date-line ambiguities. Missing events
+// (polar day/night) are encoded by the API as 1970 epochs and stored here
+// as null. TOLERANCE covers the refraction-model differences between the
+// reference and our implementation (max observed deviation: 199 s).
+
+using Toybox.Lang;
+using Toybox.Time as Time;
+using Toybox.Position as Pos;
+
+(:test)
+module SunCalcTestHelpers {
+
+    const TOLERANCE = 300;
+
+    function makeView(epoch, lat, lng) as SunCalcView {
+        // force all rows visible so selection is deterministic
+        for (var i = 0; i < DISPLAY.size(); i++) {
+            DISPLAY[i][D_SHOW] = true;
+        }
+        var v = new SunCalcView();
+        v.now = new Time.Moment(epoch);
+        v.lastLoc = new Pos.Location(
+            { :latitude => lat, :longitude => lng, :format => :degrees }
+            ).toRadians();
+        v.DAY_IN_ADVANCE = 0;
+        return v;
+    }
+
+    function near(logger, what, moment, expected) {
+        if (moment == null) {
+            logger.debug(what + ": expected " + expected + ", got null");
+            return false;
+        }
+        var dev = moment.value().toLong() - expected;
+        if (dev < 0) {
+            dev = -dev;
+        }
+        if (dev > TOLERANCE) {
+            logger.debug(what + ": expected " + expected + ", got "
+                         + moment.value() + " (off by " + dev + "s)");
+            return false;
+        }
+        return true;
+    }
+}
+
+(:test)
+function testReferenceFixtures(logger) {
+    var fixtures = [
+        [ 1768473279, 70.6632359d, 23.681726d, ASTRO_DAWN, 1768453031 ], // hammerfest 2026-01-15
+        [ 1768473279, 70.6632359d, 23.681726d, NAUTIC_DAWN, 1768457721 ], // hammerfest 2026-01-15
+        [ 1768473279, 70.6632359d, 23.681726d, DAWN, 1768463550 ], // hammerfest 2026-01-15
+        [ 1768473279, 70.6632359d, 23.681726d, SUNRISE, null ], // hammerfest 2026-01-15 (polar night)
+        [ 1768473279, 70.6632359d, 23.681726d, NOON, 1768473279 ], // hammerfest 2026-01-15
+        [ 1768473279, 70.6632359d, 23.681726d, SUNSET, null ], // hammerfest 2026-01-15 (polar night)
+        [ 1768473279, 70.6632359d, 23.681726d, DUSK, 1768483008 ], // hammerfest 2026-01-15
+        [ 1768473279, 70.6632359d, 23.681726d, NAUTIC_DUSK, 1768488837 ], // hammerfest 2026-01-15
+        [ 1768473279, 70.6632359d, 23.681726d, ASTRO_DUSK, 1768493527 ], // hammerfest 2026-01-15
+        [ 1782037625, 70.6632359d, 23.681726d, ASTRO_DAWN, null ], // hammerfest 2026-06-21 (midnight sun)
+        [ 1782037625, 70.6632359d, 23.681726d, NAUTIC_DAWN, null ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, DAWN, null ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, SUNRISE, null ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, NOON, 1782037625 ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, SUNSET, null ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, DUSK, null ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, NAUTIC_DUSK, null ], // hammerfest 2026-06-21
+        [ 1782037625, 70.6632359d, 23.681726d, ASTRO_DUSK, null ], // hammerfest 2026-06-21
+        [ 1789813144, 70.6632359d, 23.681726d, ASTRO_DAWN, null ], // hammerfest 2026-09-19 (twilight boundary)
+        [ 1789813144, 70.6632359d, 23.681726d, NAUTIC_DAWN, 1789780937 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, DAWN, 1789786113 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, SUNRISE, 1789789794 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, NOON, 1789813144 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, SUNSET, 1789836494 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, DUSK, 1789840175 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, NAUTIC_DUSK, 1789845350 ], // hammerfest 2026-09-19
+        [ 1789813144, 70.6632359d, 23.681726d, ASTRO_DUSK, null ], // hammerfest 2026-09-19
+        [ 1782003302, -77.85d, 166.67d, ASTRO_DAWN, 1781987560 ], // mcmurdo 2026-06-21 (antarctic winter)
+        [ 1782003302, -77.85d, 166.67d, NAUTIC_DAWN, 1781998386 ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, DAWN, null ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, SUNRISE, null ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, NOON, 1782003302 ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, SUNSET, null ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, DUSK, null ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, NAUTIC_DUSK, 1782008219 ], // mcmurdo 2026-06-21
+        [ 1782003302, -77.85d, 166.67d, ASTRO_DUSK, 1782019045 ], // mcmurdo 2026-06-21
+        [ 1797814269, -77.85d, 166.67d, ASTRO_DAWN, null ], // mcmurdo 2026-12-21 (antarctic midnight sun)
+        [ 1797814269, -77.85d, 166.67d, NAUTIC_DAWN, null ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, DAWN, null ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, SUNRISE, null ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, NOON, 1797814269 ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, SUNSET, null ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, DUSK, null ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, NAUTIC_DUSK, null ], // mcmurdo 2026-12-21
+        [ 1797814269, -77.85d, 166.67d, ASTRO_DUSK, null ], // mcmurdo 2026-12-21
+        [ 1774005625, 48.101d, 11.7598d, ASTRO_DAWN, 1773977426 ], // munich 2026-03-20 (equinox)
+        [ 1774005625, 48.101d, 11.7598d, NAUTIC_DAWN, 1773979687 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, DAWN, 1773981879 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, SUNRISE, 1773983644 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, NOON, 1774005625 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, SUNSET, 1774027606 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, DUSK, 1774029371 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, NAUTIC_DUSK, 1774031563 ], // munich 2026-03-20
+        [ 1774005625, 48.101d, 11.7598d, ASTRO_DUSK, 1774033824 ], // munich 2026-03-20
+        [ 1782040486, 48.101d, 11.7598d, ASTRO_DAWN, 1781999466 ], // munich 2026-06-21 (summer solstice)
+        [ 1782040486, 48.101d, 11.7598d, NAUTIC_DAWN, 1782005607 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, DAWN, 1782009089 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, SUNRISE, 1782011458 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, NOON, 1782040486 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, SUNSET, 1782069515 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, DUSK, 1782071884 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, NAUTIC_DUSK, 1782075366 ], // munich 2026-06-21
+        [ 1782040486, 48.101d, 11.7598d, ASTRO_DUSK, 1782081507 ], // munich 2026-06-21
+        [ 1797851460, 48.101d, 11.7598d, ASTRO_DAWN, 1797829569 ], // munich 2026-12-21 (winter solstice)
+        [ 1797851460, 48.101d, 11.7598d, NAUTIC_DAWN, 1797831844 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, DAWN, 1797834231 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, SUNRISE, 1797836304 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, NOON, 1797851460 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, SUNSET, 1797866616 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, DUSK, 1797868689 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, NAUTIC_DUSK, 1797871076 ], // munich 2026-12-21
+        [ 1797851460, 48.101d, 11.7598d, ASTRO_DUSK, 1797873352 ], // munich 2026-12-21
+        [ 1787311149, 60.0d, 11.0d, ASTRO_DAWN, null ], // 60N 2026-08-21 (no astro twilight)
+        [ 1787311149, 60.0d, 11.0d, NAUTIC_DAWN, 1787276938 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, DAWN, 1787281000 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, SUNRISE, 1787283772 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, NOON, 1787311149 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, SUNSET, 1787338526 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, DUSK, 1787341299 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, NAUTIC_DUSK, 1787345360 ], // 60N 2026-08-21
+        [ 1787311149, 60.0d, 11.0d, ASTRO_DUSK, null ], // 60N 2026-08-21
+        [ 1774027275, -0.1807d, -78.4678d, ASTRO_DAWN, 1774001355 ], // quito 2026-03-20 (equator)
+        [ 1774027275, -0.1807d, -78.4678d, NAUTIC_DAWN, 1774002795 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, DAWN, 1774004235 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, SUNRISE, 1774005411 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, NOON, 1774027275 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, SUNSET, 1774049139 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, DUSK, 1774050315 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, NAUTIC_DUSK, 1774051755 ], // quito 2026-03-20
+        [ 1774027275, -0.1807d, -78.4678d, ASTRO_DUSK, 1774053195 ], // quito 2026-03-20
+        [ 1782059704, -54.8019d, -68.303d, ASTRO_DAWN, 1782038520 ], // ushuaia 2026-06-21 (southern winter)
+        [ 1782059704, -54.8019d, -68.303d, NAUTIC_DAWN, 1782041174 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, DAWN, 1782044017 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, SUNRISE, 1782046585 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, NOON, 1782059704 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, SUNSET, 1782072824 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, DUSK, 1782075391 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, NAUTIC_DUSK, 1782078235 ], // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, ASTRO_DUSK, 1782080889 ] // ushuaia 2026-06-21
+    ] as Lang.Array<Lang.Array>;
+
+    var sc = new SunCalc();
+    var ok = true;
+    for (var i = 0; i < fixtures.size(); i++) {
+        var f = fixtures[i];
+        var loc = new Pos.Location(
+            { :latitude => f[1], :longitude => f[2], :format => :degrees }
+            ).toRadians();
+        var moment = sc.calculate(new Time.Moment(f[0]), loc, f[3]);
+        if (f[4] == null) {
+            if (moment != null) {
+                logger.debug("fixture " + i + ": expected null, got " + moment.value());
+                ok = false;
+            }
+        } else if (!SunCalcTestHelpers.near(logger, "fixture " + i, moment, f[4])) {
+            ok = false;
+        }
+    }
+    return ok;
+}
+
+// Regression for the TIMES[-1] crash: on the last day before astronomical
+// twilight returns, the "Night" row has no astro dusk (from == null) but
+// the next morning has an astro dawn (to != null). The mirror formula
+// yielded index -1 and crashed with an out-of-bounds array access.
+(:test)
+function testNightRowPolarBoundaryNoCrash(logger) {
+    // Hammerfest, 2026-09-19 20:20 UTC
+    var v = SunCalcTestHelpers.makeView(1789849200, 70.6632359d, 23.681726d);
+    v.selectDisplay();
+    if (v.mDI != 14 || v.DAY_IN_ADVANCE != 0) {
+        logger.debug("expected Night (14/day 0), got " + v.mDI + "/day " + v.DAY_IN_ADVANCE);
+        return false;
+    }
+    var ft = v.getFromTo(); // crashed before the fix
+    if (ft[0] != null) {
+        logger.debug("expected open start (--:--), got " + ft[0].value());
+        return false;
+    }
+    return SunCalcTestHelpers.near(logger, "night end", ft[1], 1789858058);
+}
+
+// Same boundary situation at 60N in late August (no astronomical twilight
+// season): the walk must continue into the next day instead of taking the
+// former unconditional "no sunset" branch.
+(:test)
+function testBrightNightBoundaryNoCrash(logger) {
+    // 60N 11E, 2026-08-21 21:30 UTC
+    var v = SunCalcTestHelpers.makeView(1787347800, 60.0d, 11.0d);
+    v.selectDisplay();
+    if (v.mDI != 14 || v.DAY_IN_ADVANCE != 0) {
+        logger.debug("expected Night (14/day 0), got " + v.mDI + "/day " + v.DAY_IN_ADVANCE);
+        return false;
+    }
+    var ft = v.getFromTo();
+    if (ft[0] != null) {
+        logger.debug("expected open start (--:--), got " + ft[0].value());
+        return false;
+    }
+    return SunCalcTestHelpers.near(logger, "night end", ft[1], 1787355776);
+}
+
+// Regression for the "Morning is never displayed" bug: any late morning
+// used to trip the "no sunrise" heuristic and reset the display to
+// "Nautic Dawn" with stale times.
+(:test)
+function testMorningIsDisplayed(logger) {
+    // Munich, 2026-06-26 06:40 UTC (mid-morning)
+    var v = SunCalcTestHelpers.makeView(1782456000, 48.1010d, 11.7598d);
+    v.selectDisplay();
+    if (v.mDI != 6 || v.DAY_IN_ADVANCE != 0) {
+        logger.debug("expected Morning (6/day 0), got " + v.mDI + "/day " + v.DAY_IN_ADVANCE);
+        return false;
+    }
+    var ft = v.getFromTo();
+    return SunCalcTestHelpers.near(logger, "sunrise", ft[0], 1782443666)
+        && SunCalcTestHelpers.near(logger, "noon", ft[1], 1782472549);
+}
+
+// Real polar night: the "no sunrise" branch must still fire and fall back
+// to the first displayable row after midnight.
+(:test)
+function testPolarNightSelection(logger) {
+    // Hammerfest, 2026-01-15 10:00 UTC (sun never rises)
+    var v = SunCalcTestHelpers.makeView(1768471200, 70.6632359d, 23.681726d);
+    v.selectDisplay();
+    if (v.mDI != 1 || v.DAY_IN_ADVANCE != 0) {
+        logger.debug("expected Nautic Dawn (1/day 0), got " + v.mDI + "/day " + v.DAY_IN_ADVANCE);
+        return false;
+    }
+    var ft = v.getFromTo();
+    return SunCalcTestHelpers.near(logger, "nautic dawn", ft[0], 1768457781)
+        && SunCalcTestHelpers.near(logger, "dawn", ft[1], 1768463640);
+}
+
+// Midnight sun: selection must terminate without any valid twilight events.
+(:test)
+function testPolarDaySelection(logger) {
+    // Hammerfest, 2026-06-21 10:00 UTC (sun never sets)
+    var v = SunCalcTestHelpers.makeView(1782036000, 70.6632359d, 23.681726d);
+    v.selectDisplay();
+    if (v.mDI != 1 || v.DAY_IN_ADVANCE != 0) {
+        logger.debug("expected row 1/day 0, got " + v.mDI + "/day " + v.DAY_IN_ADVANCE);
+        return false;
+    }
+    var ft = v.getFromTo();
+    if (ft[0] != null || ft[1] != null) {
+        logger.debug("expected --:-- / --:--");
+        return false;
+    }
+    return true;
+}
+
+(:test)
+function testMomentToStringNull(logger) {
+    var sc = new SunCalc();
+    return sc.momentToString(null, true).equals("--:--");
+}

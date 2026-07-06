@@ -93,6 +93,14 @@ class SunCalcView extends Ui.View {
             ).toRadians();
         */
 
+        selectDisplay();
+        myUpdate();
+    }
+
+    // Walk the DISPLAY table to the period that should be shown for
+    // self.now / self.lastLoc, setting mDI and DAY_IN_ADVANCE.
+    // Factored out of setPosition() so unit tests can drive it.
+    function selectDisplay() as Void {
         DAY_IN_ADVANCE = 0;
         mDI = 0; // morning
 
@@ -107,13 +115,16 @@ class SunCalcView extends Ui.View {
         moment = getMoment(DISPLAY[mDI][D_TO]);
 
         while((moment == null) || ( now.value() > moment.value() )) {
-            Sys.println("displayNext()");
             if (!displayNext()) {
                 break;
             }
             moment = getMoment(DISPLAY[mDI][D_TO]);
 
-            if (mDI == 6) {
+            // Reaching "Morning" means all earlier periods ended or don't
+            // exist. Only treat that as polar night if there really is no
+            // sunrise that day; otherwise "Morning" is simply the current
+            // period (any late morning at any latitude).
+            if (mDI == 6 && getMoment(SUNRISE) == null) {
                 Sys.println("No sunrise:");
                 // The sun didn't rise today
                 // Display anything to show after midnight
@@ -123,7 +134,12 @@ class SunCalcView extends Ui.View {
                 break;
             }
 
-            if (DAY_IN_ADVANCE > 0) {
+            // Wrapping into the next day is only a "no sunset" (polar day /
+            // polar night PM) situation if that day has no sunset. At high
+            // latitudes in summer the walk legitimately continues into the
+            // next day (e.g. "Astr. Dawn +1" when there is no astronomical
+            // dusk but the sun still sets).
+            if (DAY_IN_ADVANCE > 0 && getMoment(SUNSET) == null) {
                 Sys.println("No sunset:");
                 // The sun does go down today or did not rise.
                 // Display anything to show after afternoon
@@ -132,8 +148,18 @@ class SunCalcView extends Ui.View {
                 displayNext();
                 break;
             }
+
+            // Safety stop: nothing displayable within a full day ahead
+            // (e.g. only "Night" enabled during the season without
+            // astronomical twilight). Without this the walk would advance
+            // day by day indefinitely.
+            if (DAY_IN_ADVANCE > 1) {
+                DAY_IN_ADVANCE = 0;
+                mDI = 7;
+                displayNext();
+                break;
+            }
         }
-        myUpdate();
     }
 
     function displayPrevious()
@@ -183,14 +209,15 @@ class SunCalcView extends Ui.View {
         myUpdate();
     }
 
+    // Uses self.now as time base so the walk in selectDisplay() stays
+    // anchored to one instant (and unit tests can inject a fixed time);
+    // setPosition() and myUpdate() refresh self.now.
     function getMoment(what) {
         var day = DAY_IN_ADVANCE;
         if (what > ASTRO_DUSK) {
             day++;
             what = ASTRO_DAWN;
         }
-        now = Time.now();
-        // for testing now = new Time.Moment(1483225200);
         return sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
     }
 
@@ -211,6 +238,7 @@ class SunCalcView extends Ui.View {
         if (!hasLayout) {
             return;
         }
+        now = Time.now();
         if (lastLoc == null) {
             (findDrawableById("what") as Ui.Text).setText(Rez.Strings.WaitingForGPS);
             (findDrawableById("time_from") as Ui.Text).setText("");
@@ -228,25 +256,39 @@ class SunCalcView extends Ui.View {
         }
 
         (findDrawableById("what") as Ui.Text).setText(DISPLAY[mDI][D_TITLE]);
+        var fromTo = getFromTo();
+
+        (findDrawableById("time_from") as Ui.Text).setText(sc.momentToString(fromTo[0], is24Hour));
+        (findDrawableById("time_to") as Ui.Text).setText(sc.momentToString(fromTo[1], is24Hour));
+
+        Ui.requestUpdate();
+    }
+
+    // Start/end moments of the currently selected period, extending a
+    // one-sided period into the mirrored event of the neighboring day.
+    // Factored out of myUpdate() so unit tests can drive it.
+    function getFromTo() as Lang.Array<Time.Moment?> {
         var from = getMoment(DISPLAY[mDI][D_FROM]);
         var to = getMoment(DISPLAY[mDI][D_TO]);
 
         if (from == null && to != null) {
             // test if this started the day before
-            var what = (2 * NOON - DISPLAY[mDI][D_TO]) % NUM_RESULTS;
-            var day = DAY_IN_ADVANCE - 1;
-            from = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
+            var what = 2 * NOON - DISPLAY[mDI][D_TO];
+            // For the "Night" row (D_TO == ASTRO_DUSK + 1) the mirrored
+            // event is today's ASTRO_DUSK again, i.e. the very moment that
+            // is null - and the raw formula would yield -1 and crash with
+            // an out-of-bounds TIMES[] access. Leave "from" open instead.
+            if (what >= 0) {
+                var day = DAY_IN_ADVANCE - 1;
+                from = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
+            }
         } else if (to == null && from != null) {
             // test if this ends the day after
-            var what = (2 * NOON - DISPLAY[mDI][D_FROM]) % NUM_RESULTS;
+            var what = 2 * NOON - DISPLAY[mDI][D_FROM];
             var day = DAY_IN_ADVANCE + 1;
             to = sc.calculate(new Time.Moment(now.value() + day * Time.Gregorian.SECONDS_PER_DAY), lastLoc, what);
         }
-
-        (findDrawableById("time_from") as Ui.Text).setText(sc.momentToString(from, is24Hour));
-        (findDrawableById("time_to") as Ui.Text).setText(sc.momentToString(to, is24Hour));
-
-        Ui.requestUpdate();
+        return [from, to];
     }
 
     function setListView(b) {

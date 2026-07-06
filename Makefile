@@ -52,8 +52,11 @@ sim:
 run: sim bin/$(APPNAME)-$(DEVICE).prg
 	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE).prg $(DEVICE) &
 
+# monkeydo exits nonzero even when all tests pass, so grade the run by its
+# output instead
 test: sim bin/$(APPNAME)-$(DEVICE)-test.prg
-	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE)-test.prg $(DEVICE) -t
+	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE)-test.prg $(DEVICE) -t | tee bin/test-output.log
+	@grep -q "^PASSED" bin/test-output.log
 
 # Headless smoke test: boot the compiled app in the simulator (under the
 # monkey-run FHS sandbox), confirm it loads/runs on $(DEVICE), and save a
