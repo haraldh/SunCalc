@@ -69,4 +69,17 @@
     <string id="showGoldenDuskTitle">Gouden uur 's avonds weergeven</string>
     <string id="showSunriseTitle">Zonsopkomst weergeven</string>
     <string id="showSunsetTitle">Zonsondergang weergeven</string>
+
+    <!-- glance-only labels (scope="glance") -->
+    <string id="gWaitGPS" scope="glance">Wachten op GPS</string>
+    <string id="gSunrise" scope="glance">Zon op.</string>
+    <string id="gSunset" scope="glance">Zon ond.</string>
+    <string id="gDawn" scope="glance">Ochtend.</string>
+    <string id="gDusk" scope="glance">Avond.</string>
+    <string id="gNDawn" scope="glance">Naut. o.</string>
+    <string id="gNDusk" scope="glance">Naut. a.</string>
+    <string id="gADawn" scope="glance">Astr. o.</string>
+    <string id="gADusk" scope="glance">Astr. a.</string>
+    <string id="gBlue" scope="glance">Blauw uur</string>
+    <string id="gGolden" scope="glance">Goud. uur</string>
 </strings>

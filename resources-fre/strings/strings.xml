@@ -69,4 +69,17 @@
     <string id="showGoldenDuskTitle">Afficher l'heure dorée du soir</string>
     <string id="showSunriseTitle">Afficher le lever du soleil</string>
     <string id="showSunsetTitle">Afficher le coucher du soleil</string>
+
+    <!-- glance-only labels (scope="glance") -->
+    <string id="gWaitGPS" scope="glance">Attente GPS</string>
+    <string id="gSunrise" scope="glance">Lever</string>
+    <string id="gSunset" scope="glance">Coucher</string>
+    <string id="gDawn" scope="glance">Aube</string>
+    <string id="gDusk" scope="glance">Crép.</string>
+    <string id="gNDawn" scope="glance">Aube N.</string>
+    <string id="gNDusk" scope="glance">Crép. N.</string>
+    <string id="gADawn" scope="glance">Aube A.</string>
+    <string id="gADusk" scope="glance">Crép. A.</string>
+    <string id="gBlue" scope="glance">H. bleue</string>
+    <string id="gGolden" scope="glance">H. dorée</string>
 </strings>

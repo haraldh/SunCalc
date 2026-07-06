@@ -69,4 +69,17 @@
     <string id="showGoldenDuskTitle">Mostra ora d'oro serale</string>
     <string id="showSunriseTitle">Mostra alba</string>
     <string id="showSunsetTitle">Mostra tramonto</string>
+
+    <!-- glance-only labels (scope="glance") -->
+    <string id="gWaitGPS" scope="glance">Attesa GPS</string>
+    <string id="gSunrise" scope="glance">Alba</string>
+    <string id="gSunset" scope="glance">Tramonto</string>
+    <string id="gDawn" scope="glance">Crep. m.</string>
+    <string id="gDusk" scope="glance">Crep. s.</string>
+    <string id="gNDawn" scope="glance">Naut. m.</string>
+    <string id="gNDusk" scope="glance">Naut. s.</string>
+    <string id="gADawn" scope="glance">Astr. m.</string>
+    <string id="gADusk" scope="glance">Astr. s.</string>
+    <string id="gBlue" scope="glance">Ora blu</string>
+    <string id="gGolden" scope="glance">Ora oro</string>
 </strings>

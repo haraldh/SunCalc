@@ -72,8 +72,10 @@ class SunCalcGlanceView extends Ui.GlanceView {
         var w = dc.getWidth();
         var h = dc.getHeight();
 
-        // Note: the glance process cannot access the Rez resource module,
-        // so all labels here are literals.
+        // Labels come from glance-scoped string resources (scope="glance" in
+        // strings.xml); loading an unscoped resource here throws Illegal
+        // Access. Rez ids are referenced only inside this function, never in a
+        // module global (that crashes the glance at load).
         //
         // The glance never acquires a fix itself; it uses the live cached fix
         // if there is one, else the last position the full widget saved. That
@@ -87,7 +89,7 @@ class SunCalcGlanceView extends Ui.GlanceView {
             loc = loadStoredLoc();
         }
         if (loc == null) {
-            dc.drawText(0, h / 2, font, "Waiting for GPS",
+            dc.drawText(0, h / 2, font, Ui.loadResource(Rez.Strings.gWaitGPS),
                         Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
             return;
         }
@@ -97,14 +99,21 @@ class SunCalcGlanceView extends Ui.GlanceView {
         var is24 = Sys.getDeviceSettings().is24Hour;
 
         // ---- header: countdown to the chosen topic's next event ----
-        var topic = TOPICS[topicFor("glanceTopic", 0)] as Lang.Array;
+        // Labels are glance-scoped resources loaded here (never at module
+        // scope) so the strings localize without crashing the glance.
+        var ti = topicFor("glanceTopic", 0);
+        var topic = TOPICS[ti] as Lang.Array;
+        var amLabels = [ Rez.Strings.gSunrise, Rez.Strings.gDawn, Rez.Strings.gNDawn,
+                         Rez.Strings.gADawn, Rez.Strings.gBlue, Rez.Strings.gGolden ];
+        var pmLabels = [ Rez.Strings.gSunset, Rez.Strings.gDusk, Rez.Strings.gNDusk,
+                         Rez.Strings.gADusk, Rez.Strings.gBlue, Rez.Strings.gGolden ];
         var rise = nextEvent(sc, now, loc, topic[T_AM]);
         var set = nextEvent(sc, now, loc, topic[T_PM]);
         var next = null;
-        var label = topic[T_PM_LABEL] as Lang.String;
+        var labelRes = pmLabels[ti];
         if (rise != null && (set == null || rise.value() < set.value())) {
             next = rise;
-            label = topic[T_AM_LABEL] as Lang.String;
+            labelRes = amLabels[ti];
         } else if (set != null) {
             next = set;
         }
@@ -114,9 +123,9 @@ class SunCalcGlanceView extends Ui.GlanceView {
             var delta = (next.value() - now.value()).toNumber();
             var hh = delta / 3600;
             var mm = (delta % 3600) / 60;
-            head = label + " " + hh + "h " + mm + "m";
+            head = Ui.loadResource(labelRes) + " " + hh + "h " + mm + "m";
         } else {
-            head = "Twilight";
+            head = "--";
         }
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawText(0, (h * 15) / 100, font, head,

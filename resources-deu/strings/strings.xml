@@ -74,4 +74,17 @@
     <string id="showGoldenDuskTitle">Goldene Stunde abends anzeigen</string>
     <string id="showSunriseTitle">Sonnenaufgang anzeigen</string>
     <string id="showSunsetTitle">Sonnenuntergang anzeigen</string>
+
+    <!-- glance-only labels (scope="glance") -->
+    <string id="gWaitGPS" scope="glance">Warte auf GPS</string>
+    <string id="gSunrise" scope="glance">So.aufg.</string>
+    <string id="gSunset" scope="glance">So.unt.</string>
+    <string id="gDawn" scope="glance">Morgend.</string>
+    <string id="gDusk" scope="glance">Abendd.</string>
+    <string id="gNDawn" scope="glance">Naut.M.</string>
+    <string id="gNDusk" scope="glance">Naut.A.</string>
+    <string id="gADawn" scope="glance">Astr.M.</string>
+    <string id="gADusk" scope="glance">Astr.A.</string>
+    <string id="gBlue" scope="glance">Blaue St.</string>
+    <string id="gGolden" scope="glance">Gold. St.</string>
 </strings>

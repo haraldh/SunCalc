@@ -26,6 +26,20 @@
     <string id="Show">Show</string>
     <string id="Today">TODAY</string>
 
+    <!-- glance-only labels: scope="glance" so the glance process can load
+         them (unscoped resources throw Illegal Access there) -->
+    <string id="gWaitGPS" scope="glance">Waiting for GPS</string>
+    <string id="gSunrise" scope="glance">Sunrise</string>
+    <string id="gSunset" scope="glance">Sunset</string>
+    <string id="gDawn" scope="glance">Dawn</string>
+    <string id="gDusk" scope="glance">Dusk</string>
+    <string id="gNDawn" scope="glance">N.Dawn</string>
+    <string id="gNDusk" scope="glance">N.Dusk</string>
+    <string id="gADawn" scope="glance">A.Dawn</string>
+    <string id="gADusk" scope="glance">A.Dusk</string>
+    <string id="gBlue" scope="glance">Blue Hr</string>
+    <string id="gGolden" scope="glance">Golden</string>
+
     <!-- pager period titles (FONT_LARGE): keep short, abbreviate in translations -->
     <string id="pAstroDawn">Astr. Dawn</string>
     <string id="pNauticDawn">Nautic Dawn</string>
