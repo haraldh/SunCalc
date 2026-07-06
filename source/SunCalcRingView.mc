@@ -107,6 +107,7 @@ class SunCalcRingView extends Ui.View {
             return;
         }
         lastLoc = info.position.toRadians();
+        saveLoc(lastLoc);
         Ui.requestUpdate();
     }
 

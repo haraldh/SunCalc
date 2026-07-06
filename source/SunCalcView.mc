@@ -98,6 +98,7 @@ class SunCalcView extends Ui.View {
 
         var loc = info.position.toRadians();
         self.lastLoc = loc;
+        saveLoc(loc);
         now = Time.now();
         /* For testing
            now = new Time.Moment(1483225200);

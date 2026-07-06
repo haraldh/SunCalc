@@ -45,3 +45,28 @@ function topicFor(key, def) {
     }
     return v;
 }
+
+// Persist the last good position (radians) so the glance can still show data
+// when the device's own cached GPS fix is stale or unavailable - the glance
+// only reads Pos.getInfo() and never acquires a fix itself.
+function saveLoc(loc) {
+    try {
+        App.Storage.setValue("lastLat", loc[0]);
+        App.Storage.setValue("lastLng", loc[1]);
+    } catch (e) {
+    }
+}
+
+// [lat, lng] in radians from storage, or null if never saved.
+(:glance)
+function loadStoredLoc() {
+    try {
+        var lat = App.Storage.getValue("lastLat");
+        var lng = App.Storage.getValue("lastLng");
+        if (lat != null && lng != null) {
+            return [lat, lng];
+        }
+    } catch (e) {
+    }
+    return null;
+}

@@ -74,16 +74,25 @@ class SunCalcGlanceView extends Ui.GlanceView {
 
         // Note: the glance process cannot access the Rez resource module,
         // so all labels here are literals.
+        //
+        // The glance never acquires a fix itself; it uses the live cached fix
+        // if there is one, else the last position the full widget saved. That
+        // keeps it populated even when the device's GPS cache is stale.
         var info = Pos.getInfo();
-        if (info == null || info.position == null
-            || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
+        var loc = null;
+        if (info != null && info.position != null
+            && info.accuracy != Pos.QUALITY_NOT_AVAILABLE) {
+            loc = info.position.toRadians();
+        } else {
+            loc = loadStoredLoc();
+        }
+        if (loc == null) {
             dc.drawText(0, h / 2, font, "Waiting for GPS",
                         Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
             return;
         }
 
         var sc = new SunCalc();
-        var loc = info.position.toRadians();
         var now = Time.now();
         var is24 = Sys.getDeviceSettings().is24Hour;
 
