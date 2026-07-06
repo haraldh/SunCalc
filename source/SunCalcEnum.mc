@@ -30,3 +30,13 @@ enum {
     D_PROP,
     D_SHOW
 }
+
+// columns of a TOPICS entry (see SunCalcTopics.mc)
+(:glance)
+enum {
+    T_TITLE,
+    T_AM,
+    T_PM,
+    T_AM_LABEL,
+    T_PM_LABEL
+}

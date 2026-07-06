@@ -332,6 +332,32 @@ function testRingSegments(logger) {
         && segs[2] == null && segs[3] == null && segs[4] == null && segs[5] == null;
 }
 
+// The TOPICS table is API (indices are stored in properties and mirror the
+// settings.xml listEntry values), so verify its shape and the morning/evening
+// ordering, plus that topicFor() bounds-checks bad indices.
+(:test)
+function testTopics(logger) {
+    for (var i = 0; i < TOPICS.size(); i++) {
+        var t = TOPICS[i];
+        if (t.size() != 5) {
+            logger.debug("topic " + i + " wrong column count");
+            return false;
+        }
+        // morning event is before noon, evening event is after noon
+        if (!(t[T_AM] < NOON && t[T_PM] > NOON)) {
+            logger.debug("topic " + i + " am/pm not around noon");
+            return false;
+        }
+    }
+
+    // topicFor falls back to the default for an out-of-range or unset value
+    if (topicFor("no.such.property", 3) != 3) {
+        logger.debug("topicFor did not fall back to default");
+        return false;
+    }
+    return true;
+}
+
 (:test)
 function testMomentToStringNull(logger) {
     var sc = new SunCalc();

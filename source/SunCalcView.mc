@@ -45,6 +45,12 @@ class SunCalcView extends Ui.View {
     var is24Hour;
     var hasLayout;
     var mDI;
+    // rendered strings (the view is drawn in code, no static layout, so the
+    // colors can follow the dark/light theme at runtime)
+    var mTitle;
+    var mFrom;
+    var mTo;
+    var mShowDash;
 
     function initialize() {
         View.initialize();
@@ -58,20 +64,24 @@ class SunCalcView extends Ui.View {
         thirdHeight = null;
         is24Hour = Sys.getDeviceSettings().is24Hour;
         hasLayout = false;
+        mTitle = "";
+        mFrom = "";
+        mTo = "";
+        mShowDash = false;
     }
 
     //! Load your resources here
     function onLayout(dc) {
-        setLayout(Rez.Layouts.MainLayout(dc));
         hasLayout = true;
         thirdHeight = dc.getHeight() / 3;
 
         var info = Pos.getInfo();
         if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
             Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:setPosition));
-            (findDrawableById("what") as Ui.Text).setText("Waiting for GPS");
-            (findDrawableById("time_from") as Ui.Text).setText("");
-            (findDrawableById("time_to") as Ui.Text).setText("");
+            mTitle = Ui.loadResource(Rez.Strings.WaitingForGPS);
+            mFrom = "";
+            mTo = "";
+            mShowDash = false;
         } else {
             setPosition(info);
         }
@@ -222,15 +232,59 @@ class SunCalcView extends Ui.View {
     }
 
     function onUpdate(dc) {
-        Ui.View.onUpdate(dc);
+        var w = dc.getWidth();
+        var h = dc.getHeight();
 
-        if (listView) {
-            var arrow = new Rez.Drawables.Arrow_updown();
-            arrow.draw(dc);
-        } else {
-            var arrow = new Rez.Drawables.Arrow_right();
-            arrow.draw(dc);
+        var dark = getConfig("darkMode", true);
+        var fg = dark ? Gfx.COLOR_WHITE : Gfx.COLOR_BLACK;
+        var bg = dark ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE;
+        dc.setColor(fg, bg);
+        dc.clear();
+
+        // divider bars delimiting the top / bottom tap zones
+        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(2);
+        dc.drawLine(0, (h * 187) / 1000, w, (h * 187) / 1000);
+        dc.drawLine(0, (h * 813) / 1000, w, (h * 813) / 1000);
+
+        dc.setColor(fg, Gfx.COLOR_TRANSPARENT);
+        // top-anchored so FONT_LARGE sits just below the upper divider
+        dc.drawText(w / 2, (h * 21) / 100, Gfx.FONT_LARGE, mTitle,
+                    Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w / 2, (h * 416) / 1000, Gfx.FONT_MEDIUM, mFrom,
+                    Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        if (mShowDash) {
+            dc.drawText(w / 2, (h * 50) / 100, Gfx.FONT_MEDIUM, "-",
+                        Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
         }
+        dc.drawText(w / 2, (h * 584) / 1000, Gfx.FONT_MEDIUM, mTo,
+                    Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+
+        // navigation arrows: up/down when paging the list, else a right arrow
+        dc.setColor(fg, Gfx.COLOR_TRANSPARENT);
+        if (listView) {
+            drawUpDownArrows(dc, w, h);
+        } else {
+            drawRightArrow(dc, w, h);
+        }
+    }
+
+    // proportions taken from the former per-device layout (based on 454px)
+    hidden function drawUpDownArrows(dc, w, h) {
+        var cx = w / 2;
+        var aw = w / 22;
+        var top = h / 50;
+        var ah = h / 24;
+        var bot = h - top;
+        dc.fillPolygon([[cx, top], [cx - aw, top + ah], [cx + aw, top + ah]]);
+        dc.fillPolygon([[cx, bot], [cx - aw, bot - ah], [cx + aw, bot - ah]]);
+    }
+
+    hidden function drawRightArrow(dc, w, h) {
+        var x = w / 2 - w / 50;
+        var y = h / 16;
+        var hgt = h / 12;
+        dc.fillPolygon([[x, y], [x, y + hgt], [x + w / 24, y + hgt / 2]]);
     }
 
     //! Update the view
@@ -240,26 +294,28 @@ class SunCalcView extends Ui.View {
         }
         now = Time.now();
         if (lastLoc == null) {
-            (findDrawableById("what") as Ui.Text).setText(Rez.Strings.WaitingForGPS);
-            (findDrawableById("time_from") as Ui.Text).setText("");
-            (findDrawableById("time_to") as Ui.Text).setText("");
+            mTitle = Ui.loadResource(Rez.Strings.WaitingForGPS);
+            mFrom = "";
+            mTo = "";
+            mShowDash = false;
             Ui.requestUpdate();
             return;
         }
 
         if (NO_DISPLAY) {
-            (findDrawableById("what") as Ui.Text).setText("");
-            (findDrawableById("time_from") as Ui.Text).setText(Rez.Strings.NothingToDisplay);
-            (findDrawableById("time_to") as Ui.Text).setText(Rez.Strings.PressMenu);
+            mTitle = "";
+            mFrom = Ui.loadResource(Rez.Strings.NothingToDisplay);
+            mTo = Ui.loadResource(Rez.Strings.PressMenu);
+            mShowDash = false;
             Ui.requestUpdate();
             return;
         }
 
-        (findDrawableById("what") as Ui.Text).setText(DISPLAY[mDI][D_TITLE]);
+        mTitle = DISPLAY[mDI][D_TITLE];
         var fromTo = getFromTo();
-
-        (findDrawableById("time_from") as Ui.Text).setText(sc.momentToString(fromTo[0], is24Hour));
-        (findDrawableById("time_to") as Ui.Text).setText(sc.momentToString(fromTo[1], is24Hour));
+        mFrom = sc.momentToString(fromTo[0], is24Hour);
+        mTo = sc.momentToString(fromTo[1], is24Hour);
+        mShowDash = true;
 
         Ui.requestUpdate();
     }

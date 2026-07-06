@@ -87,14 +87,15 @@ class SunCalcGlanceView extends Ui.GlanceView {
         var now = Time.now();
         var is24 = Sys.getDeviceSettings().is24Hour;
 
-        // ---- header: countdown to the next sunrise / sunset ----
-        var rise = nextEvent(sc, now, loc, SUNRISE);
-        var set = nextEvent(sc, now, loc, SUNSET);
+        // ---- header: countdown to the chosen topic's next event ----
+        var topic = TOPICS[topicFor("glanceTopic", 0)] as Lang.Array;
+        var rise = nextEvent(sc, now, loc, topic[T_AM]);
+        var set = nextEvent(sc, now, loc, topic[T_PM]);
         var next = null;
-        var label = "Sunset";
+        var label = topic[T_PM_LABEL] as Lang.String;
         if (rise != null && (set == null || rise.value() < set.value())) {
             next = rise;
-            label = "Sunrise";
+            label = topic[T_AM_LABEL] as Lang.String;
         } else if (set != null) {
             next = set;
         }
@@ -173,9 +174,9 @@ class SunCalcGlanceView extends Ui.GlanceView {
 
         drawSun(dc, iconX, barY + barH / 2, iconR - 2, 0xFFAA00);
 
-        // ---- sunrise / sunset times under the bar ----
-        var tRise = sc.calculate(now, loc, SUNRISE);
-        var tSet = sc.calculate(now, loc, SUNSET);
+        // ---- the topic's morning / evening times under the bar ----
+        var tRise = sc.calculate(now, loc, topic[T_AM]);
+        var tSet = sc.calculate(now, loc, topic[T_PM]);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawText(barX, (h * 84) / 100, font, sc.momentToString(tRise, is24),
                     Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);

@@ -67,6 +67,7 @@ class SunCalcRingView extends Ui.View {
     var now;
     var lastLoc;
     var is24Hour;
+    var fgColor; // foreground, follows the dark/light theme
 
     function initialize() {
         View.initialize();
@@ -74,6 +75,7 @@ class SunCalcRingView extends Ui.View {
         now = Time.now();
         lastLoc = null;
         is24Hour = Sys.getDeviceSettings().is24Hour;
+        fgColor = Gfx.COLOR_WHITE;
     }
 
     // Acquire the position every time the view appears (also when
@@ -155,7 +157,7 @@ class SunCalcRingView extends Ui.View {
 
         // hour marks inside the ring
         dc.setPenWidth(1);
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+        dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
         var font = Gfx.FONT_XTINY;
         var ri = r - pen / 2 - dc.getFontHeight(font) / 2 - 2;
         var labels = [ "12", "18", "24", "06" ]; // top, right, bottom, left
@@ -190,7 +192,9 @@ class SunCalcRingView extends Ui.View {
     function onUpdate(dc) {
         var w = dc.getWidth();
         var h = dc.getHeight();
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);
+        var dark = getConfig("darkMode", true);
+        fgColor = dark ? Gfx.COLOR_WHITE : Gfx.COLOR_BLACK;
+        dc.setColor(fgColor, dark ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE);
         dc.clear();
 
         if (lastLoc == null) {
@@ -203,37 +207,32 @@ class SunCalcRingView extends Ui.View {
         drawRing(dc, w, h);
         drawSun(dc, w / 2, (h * 23) / 100, w / 40 + 2);
 
-        var rise = sc.calculate(now, lastLoc, SUNRISE);
-        var set = sc.calculate(now, lastLoc, SUNSET);
-        var dawn = sc.calculate(now, lastLoc, DAWN);
-        var dusk = sc.calculate(now, lastLoc, DUSK);
-
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+        dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
         dc.drawText(w / 2, (h * 32) / 100, Gfx.FONT_XTINY,
                     Ui.loadResource(Rez.Strings.Today),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
 
-        dc.drawText((w * 32) / 100, (h * 42) / 100, Gfx.FONT_XTINY,
-                    Ui.loadResource(Rez.Strings.Sunrise),
-                    Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText((w * 68) / 100, (h * 42) / 100, Gfx.FONT_XTINY,
-                    Ui.loadResource(Rez.Strings.Sunset),
-                    Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText((w * 32) / 100, (h * 51) / 100, Gfx.FONT_MEDIUM,
-                    sc.momentToString(rise, is24Hour),
-                    Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText((w * 68) / 100, (h * 51) / 100, Gfx.FONT_MEDIUM,
-                    sc.momentToString(set, is24Hour),
-                    Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        // two user-selectable topic rows (defaults: Sunrise/Sunset, Civil)
+        drawRow(dc, w, 42, 51, Gfx.FONT_MEDIUM, topicFor("ringTop", 0));
+        drawRow(dc, w, 63, 71, Gfx.FONT_SMALL, topicFor("ringBottom", 1));
+    }
 
-        dc.drawText(w / 2, (h * 63) / 100, Gfx.FONT_XTINY,
-                    Ui.loadResource(Rez.Strings.Twilight),
+    // one ring text row: centered topic title with the morning / evening
+    // times of that topic beneath it. yTitle / yTime are percent of height.
+    hidden function drawRow(dc, w, yTitle, yTime, font, topicIdx) {
+        var t = TOPICS[topicIdx] as Lang.Array;
+        var h = dc.getHeight();
+        dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, (h * yTitle) / 100, Gfx.FONT_XTINY,
+                    t[T_TITLE] as Lang.String,
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText((w * 32) / 100, (h * 71) / 100, Gfx.FONT_SMALL,
-                    sc.momentToString(dawn, is24Hour),
+        var am = sc.calculate(now, lastLoc, t[T_AM]);
+        var pm = sc.calculate(now, lastLoc, t[T_PM]);
+        dc.drawText((w * 32) / 100, (h * yTime) / 100, font,
+                    sc.momentToString(am, is24Hour),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText((w * 68) / 100, (h * 71) / 100, Gfx.FONT_SMALL,
-                    sc.momentToString(dusk, is24Hour),
+        dc.drawText((w * 68) / 100, (h * yTime) / 100, font,
+                    sc.momentToString(pm, is24Hour),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 }

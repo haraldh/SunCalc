@@ -1,5 +1,9 @@
 <resources>
   <properties>
+    <property id="darkMode" type="boolean">true</property>
+    <property id="ringTop" type="number">0</property>
+    <property id="ringBottom" type="number">1</property>
+    <property id="glanceTopic" type="number">0</property>
     <property id="showNight" type="boolean">true</property>
     <property id="showMorning" type="boolean">true</property>
     <property id="showAfternoon" type="boolean">true</property>
@@ -18,6 +22,16 @@
   </properties>
 
   <strings>
+    <string id="darkModeTitle">Dark theme (white on black)</string>
+    <string id="ringTopTitle">Ring: top row</string>
+    <string id="ringBottomTitle">Ring: bottom row</string>
+    <string id="glanceTopicTitle">Glance topic</string>
+    <string id="topicSun">Sunrise / Sunset</string>
+    <string id="topicCivil">Civil Twilight</string>
+    <string id="topicNautic">Nautical Twilight</string>
+    <string id="topicAstro">Astronomical Twilight</string>
+    <string id="topicBlue">Blue Hour</string>
+    <string id="topicGolden">Golden Hour</string>
     <string id="showNightTitle">Show Night</string>
     <string id="showMorningTitle">Show Morning</string>
     <string id="showAfternoonTitle">Show Afternoon</string>
@@ -36,6 +50,39 @@
   </strings>
 
   <settings>
+    <setting propertyKey="@Properties.darkMode" title="@Strings.darkModeTitle">
+      <settingConfig type="boolean" />
+    </setting>
+    <setting propertyKey="@Properties.ringTop" title="@Strings.ringTopTitle">
+      <settingConfig type="list">
+        <listEntry value="0">@Strings.topicSun</listEntry>
+        <listEntry value="1">@Strings.topicCivil</listEntry>
+        <listEntry value="2">@Strings.topicNautic</listEntry>
+        <listEntry value="3">@Strings.topicAstro</listEntry>
+        <listEntry value="4">@Strings.topicBlue</listEntry>
+        <listEntry value="5">@Strings.topicGolden</listEntry>
+      </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.ringBottom" title="@Strings.ringBottomTitle">
+      <settingConfig type="list">
+        <listEntry value="0">@Strings.topicSun</listEntry>
+        <listEntry value="1">@Strings.topicCivil</listEntry>
+        <listEntry value="2">@Strings.topicNautic</listEntry>
+        <listEntry value="3">@Strings.topicAstro</listEntry>
+        <listEntry value="4">@Strings.topicBlue</listEntry>
+        <listEntry value="5">@Strings.topicGolden</listEntry>
+      </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.glanceTopic" title="@Strings.glanceTopicTitle">
+      <settingConfig type="list">
+        <listEntry value="0">@Strings.topicSun</listEntry>
+        <listEntry value="1">@Strings.topicCivil</listEntry>
+        <listEntry value="2">@Strings.topicNautic</listEntry>
+        <listEntry value="3">@Strings.topicAstro</listEntry>
+        <listEntry value="4">@Strings.topicBlue</listEntry>
+        <listEntry value="5">@Strings.topicGolden</listEntry>
+      </settingConfig>
+    </setting>
     <setting propertyKey="@Properties.showNight" title="@Strings.showNightTitle">
       <settingConfig type="boolean" required="true" />
     </setting>
