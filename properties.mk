@@ -1,7 +1,7 @@
 # Machine-specific overrides (gitignored, optional)
 -include properties.local.mk
 
-DEVICE ?= marqathlete
+DEVICE ?= marqadventurer
 ifeq ($(shell uname -s),Darwin)
 SDK_HOME ?= $(shell cat $(HOME)/Library/Application\ Support/Garmin/ConnectIQ/current-sdk.cfg)
 else
