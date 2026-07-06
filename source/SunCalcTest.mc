@@ -289,44 +289,47 @@ function testRingSegments(logger) {
 
     // Munich mid-summer morning: every band has real crossings
     var segs = ringSegments(sc, new Time.Moment(1782456000), SunCalcTestHelpers.locOf(48.1010d, 11.7598d));
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 6; i++) {
         if (!(segs[i] instanceof Lang.Array)) {
             logger.debug("munich band " + i + " not a pair");
             return false;
         }
     }
 
-    // Hammerfest midnight sun: never below the horizon (bands 0-3 :full),
-    // but grazing it, so the golden-hour band still has +6 deg crossings
+    // Hammerfest midnight sun: the sun grazes to about +4 deg at its low
+    // point, so every band up to the golden-hour threshold is :full and
+    // only the +6 deg golden-hour band has real crossings
     segs = ringSegments(sc, new Time.Moment(1782036000), SunCalcTestHelpers.locOf(70.6632359d, 23.681726d));
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 5; i++) {
         if (segs[i] != :full) {
             logger.debug("hammerfest jun band " + i + " != :full");
             return false;
         }
     }
-    if (!(segs[4] instanceof Lang.Array)) {
+    if (!(segs[5] instanceof Lang.Array)) {
         logger.debug("hammerfest jun golden band not a pair");
         return false;
     }
 
-    // Hammerfest polar night with twilight: no day, but all twilights
+    // Hammerfest polar night: the sun peaks near -2 deg, so it crosses the
+    // twilight/blue-hour thresholds (bands 0-3) but never rises (sunrise
+    // and golden-hour bands null)
     segs = ringSegments(sc, new Time.Moment(1768471200), SunCalcTestHelpers.locOf(70.6632359d, 23.681726d));
-    if (segs[3] != null || segs[4] != null) {
-        logger.debug("hammerfest jan: day/golden bands should be null");
+    if (segs[4] != null || segs[5] != null) {
+        logger.debug("hammerfest jan: sunrise/golden bands should be null");
         return false;
     }
-    for (var i = 0; i < 3; i++) {
+    for (var i = 0; i < 4; i++) {
         if (!(segs[i] instanceof Lang.Array)) {
             logger.debug("hammerfest jan band " + i + " not a pair");
             return false;
         }
     }
 
-    // McMurdo antarctic winter: astro+nautic twilight only
+    // McMurdo antarctic winter: only astronomical and nautical twilight
     segs = ringSegments(sc, new Time.Moment(1782003302), SunCalcTestHelpers.locOf(-77.85d, 166.67d));
     return segs[0] instanceof Lang.Array && segs[1] instanceof Lang.Array
-        && segs[2] == null && segs[3] == null && segs[4] == null;
+        && segs[2] == null && segs[3] == null && segs[4] == null && segs[5] == null;
 }
 
 (:test)

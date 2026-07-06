@@ -10,14 +10,19 @@ using Toybox.Lang;
 // [ dawn event, dusk event, altitude threshold (rad), color ]
 // The threshold decides between "all day" and "never" when both
 // crossings are missing (polar day/night).
+// Twilight/day bands for the 24h ring, drawn outermost-altitude first so
+// each successive (higher-sun) band overpaints the middle, leaving one
+// visible rim per band. Three distinct warm tiers near the horizon:
+//   blue hour..sunrise   -> reddish  (the actual sunrise/sunset glow)
+//   sunrise..golden end  -> gold     (golden hour)
+//   above +6 deg         -> pale day
 var RING_BANDS as Lang.Array<Lang.Array> = [
     [ ASTRO_DAWN, ASTRO_DUSK, -18.0 * 0.017453293, 0x0000AA ],
     [ NAUTIC_DAWN, NAUTIC_DUSK, -12.0 * 0.017453293, 0x0055AA ],
     [ DAWN, DUSK, -6.0 * 0.017453293, 0x55AAFF ],
-    // sunrise..golden hour end stays visible as the reddish rim between
-    // this band and the plain-day band above +6 degrees
-    [ SUNRISE, SUNSET, -0.833 * 0.017453293, 0xFF5500 ],
-    [ GOLDEN_HOUR_AM, GOLDEN_HOUR_PM, 6.0 * 0.017453293, 0xFFAA00 ]
+    [ BLUE_HOUR_AM, BLUE_HOUR_PM, -4.0 * 0.017453293, 0xFF5500 ],
+    [ SUNRISE, SUNSET, -0.833 * 0.017453293, 0xFFAA00 ],
+    [ GOLDEN_HOUR_AM, GOLDEN_HOUR_PM, 6.0 * 0.017453293, 0xFFDD44 ]
 ];
 
 var RING_NIGHT = 0x000055;
