@@ -20,7 +20,9 @@ automatically; otherwise install the SDK via Garmin's SDK manager.
     make test               # unit tests in the simulator
     make run                # launch in the simulator
 
-Device support (manifest products, per-device launcher icons, layouts
-for new screen sizes) is generated from the installed device library:
+Device support (the manifest product list, the monkey.jungle, and
+per-device launcher icons) is generated from the installed device library.
+The views draw themselves in code, so no per-screen-size layout resources
+are needed:
 
     nix shell nixpkgs#librsvg -c python3 tools/gen-devices.py
