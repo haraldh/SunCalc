@@ -2,13 +2,14 @@ include properties.mk
 
 SUPPORTED_DEVICES_LIST = $(shell sed -n -e 's/<iq:product id="\(.*\)"\/>/\1/p' manifest.xml)
 SOURCES = $(shell find source -name '[^.]*.mc')
-RESOURCE_FLAGS = $(shell find resources* -name '[^.]*.xml' | tr '\n' ':' | sed 's/.$$//')
 RESFILES = $(shell find resources* -name '[^.]*.xml')
 APPNAME = $(shell grep entry manifest.xml | sed 's/.*entry="\([^"]*\).*/\1/' | sed 's/App$$//')
-SIMULATOR = $(shell [ "$$(uname)" == "Linux" ] && echo "wine32 $(SDK_HOME)/bin/simulator.exe" || echo '$(SDK_HOME)/bin/connectiq')
-MONKEYC = java -Dfile.encoding=UTF-8 -Dapple.awt.UIElement=true -jar $(SDK_HOME)/bin/monkeybrains.jar
+SIMULATOR = LD_LIBRARY_PATH="$(SDK_HOME)/bin" "$(SDK_HOME)/bin/connectiq"
+# -l 0: the sources predate the monkeyc type checker and don't pass it
+MONKEYC = "$(SDK_HOME)/bin/monkeyc" -l 0
+MONKEYDO = "$(SDK_HOME)/bin/monkeydo"
 
-.PHONY: build deploy buildall run package clean sim
+.PHONY: all build buildall deploy run test sim simcheck package clean printdevices printsupported
 
 all: build
 
@@ -18,37 +19,49 @@ clean:
 
 build: bin/$(APPNAME)-$(DEVICE).prg
 
-bin/$(APPNAME)-$(DEVICE).prg: $(SOURCES) $(RESFILES)
-	$(MONKEYC) --warn --output bin/$(APPNAME)-$(DEVICE).prg \
+buildall: $(foreach device,$(SUPPORTED_DEVICES_LIST),bin/$(APPNAME)-$(device).prg)
+
+# monkeyc drops scratch files with fixed names (internal-mir/, external-mir/,
+# gen/) into the --output directory, so concurrent compiles sharing bin/
+# corrupt each other. Each target therefore builds in its own work dir and
+# the artifacts are moved into place afterwards — this is what makes
+# `make -j buildall` safe.
+bin/$(APPNAME)-%.prg: $(SOURCES) $(RESFILES) manifest.xml
+	@mkdir -p bin/work/$(@F)
+	$(MONKEYC) --warn --output bin/work/$(@F)/$(@F) \
 	-f monkey.jungle \
 	-y $(PRIVATE_KEY) \
-	-d $(DEVICE)
+	-d $*
+	@mv bin/work/$(@F)/$(@F) $@
+	-@mv bin/work/$(@F)/$(@F).debug.xml bin/ 2>/dev/null
+	@rm -rf bin/work/$(@F)
 
-bin/$(APPNAME)-$(DEVICE)-test.prg: $(SOURCES) $(RESFILES)
-	$(MONKEYC) --warn --output bin/$(APPNAME)-$(DEVICE)-test.prg \
+bin/$(APPNAME)-$(DEVICE)-test.prg: $(SOURCES) $(RESFILES) manifest.xml
+	@mkdir -p bin/work/$(@F)
+	$(MONKEYC) --warn --output bin/work/$(@F)/$(@F) \
 	-f monkey.jungle \
 	-y $(PRIVATE_KEY) \
 	--unit-test \
 	-d $(DEVICE)
-
-buildall:
-	@for device in $(SUPPORTED_DEVICES_LIST); do \
-		echo "-----"; \
-		echo "Building for" $$device; \
-		$(MONKEYC) --warn --output bin/$(APPNAME)-$$device.prg \
-		           -f monkey.jungle \
-			   -y $(PRIVATE_KEY) \
-                           -d $$device; \
-	done
+	@mv bin/work/$(@F)/$(@F) $@
+	-@mv bin/work/$(@F)/$(@F).debug.xml bin/ 2>/dev/null
+	@rm -rf bin/work/$(@F)
 
 sim:
-	@pidof 'simulator.exe' &>/dev/null || ( $(SIMULATOR) & sleep 3 )
+	@pgrep -f "$(SDK_HOME)/bin/simulator" >/dev/null 2>&1 || ( $(SIMULATOR) & sleep 3 )
 
 run: sim bin/$(APPNAME)-$(DEVICE).prg
-	$(SDK_HOME)/bin/monkeydo bin/$(APPNAME)-$(DEVICE).prg $(DEVICE) &
+	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE).prg $(DEVICE) &
 
 test: sim bin/$(APPNAME)-$(DEVICE)-test.prg
-	$(SDK_HOME)/bin/monkeydo bin/$(APPNAME)-$(DEVICE)-test.prg $(DEVICE) -t
+	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE)-test.prg $(DEVICE) -t
+
+# Headless smoke test: boot the compiled app in the simulator (under the
+# monkey-run FHS sandbox), confirm it loads/runs on $(DEVICE), and save a
+# screenshot to bin/simcheck-$(DEVICE)/$(DEVICE).png. Needs the devShell's
+# ciq-simcheck: run as `nix develop -c make simcheck DEVICE=...`.
+simcheck: bin/$(APPNAME)-$(DEVICE).prg
+	ciq-simcheck bin/$(APPNAME)-$(DEVICE).prg $(DEVICE) bin/simcheck-$(DEVICE)
 
 $(DEPLOY)/$(APPNAME).prg: bin/$(APPNAME)-$(DEVICE).prg
 	@cp bin/$(APPNAME)-$(DEVICE).prg $(DEPLOY)/$(APPNAME).prg
@@ -56,7 +69,7 @@ $(DEPLOY)/$(APPNAME).prg: bin/$(APPNAME)-$(DEVICE).prg
 deploy: build $(DEPLOY)/$(APPNAME).prg
 
 package:
-	@$(MONKEYC) --warn -e --output bin/$(APPNAME).iq \
+	$(MONKEYC) --warn -e --output bin/$(APPNAME).iq \
 	-f monkey.jungle \
 	-y $(PRIVATE_KEY) -r
 
