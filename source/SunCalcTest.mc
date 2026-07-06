@@ -33,6 +33,12 @@ module SunCalcTestHelpers {
         return v;
     }
 
+    function locOf(lat, lng) {
+        return new Pos.Location(
+            { :latitude => lat, :longitude => lng, :format => :degrees }
+            ).toRadians();
+    }
+
     function near(logger, what, moment, expected) {
         if (moment == null) {
             logger.debug(what + ": expected " + expected + ", got null");
@@ -273,6 +279,49 @@ function testPolarDaySelection(logger) {
 function testGlanceViewLoads(logger) {
     var g = new SunCalcGlanceView();
     return g != null;
+}
+
+// Ring segments: [astro, nautic, civil, day], each an [dawn,dusk] pair,
+// :full (never below the threshold) or null (never above).
+(:test)
+function testRingSegments(logger) {
+    var sc = new SunCalc();
+
+    // Munich mid-summer morning: every band has real crossings
+    var segs = ringSegments(sc, new Time.Moment(1782456000), SunCalcTestHelpers.locOf(48.1010d, 11.7598d));
+    for (var i = 0; i < 4; i++) {
+        if (!(segs[i] instanceof Lang.Array)) {
+            logger.debug("munich band " + i + " not a pair");
+            return false;
+        }
+    }
+
+    // Hammerfest midnight sun: sun never drops below any threshold
+    segs = ringSegments(sc, new Time.Moment(1782036000), SunCalcTestHelpers.locOf(70.6632359d, 23.681726d));
+    for (var i = 0; i < 4; i++) {
+        if (segs[i] != :full) {
+            logger.debug("hammerfest jun band " + i + " != :full");
+            return false;
+        }
+    }
+
+    // Hammerfest polar night with twilight: no day, but all twilights
+    segs = ringSegments(sc, new Time.Moment(1768471200), SunCalcTestHelpers.locOf(70.6632359d, 23.681726d));
+    if (segs[3] != null) {
+        logger.debug("hammerfest jan: day band should be null");
+        return false;
+    }
+    for (var i = 0; i < 3; i++) {
+        if (!(segs[i] instanceof Lang.Array)) {
+            logger.debug("hammerfest jan band " + i + " not a pair");
+            return false;
+        }
+    }
+
+    // McMurdo antarctic winter: astro+nautic twilight only
+    segs = ringSegments(sc, new Time.Moment(1782003302), SunCalcTestHelpers.locOf(-77.85d, 166.67d));
+    return segs[0] instanceof Lang.Array && segs[1] instanceof Lang.Array
+        && segs[2] == null && segs[3] == null;
 }
 
 (:test)

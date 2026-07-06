@@ -25,4 +25,8 @@
     <string id="MenuGolden">Golden Hour</string>
     <string id="MenuNoon">Morning/Afternoon</string>
     <string id="Show">Show</string>
+    <string id="Today">TODAY</string>
+    <string id="Sunrise">SUNRISE</string>
+    <string id="Sunset">SUNSET</string>
+    <string id="Twilight">TWILIGHT</string>
 </strings>

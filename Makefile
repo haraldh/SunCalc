@@ -47,7 +47,7 @@ bin/$(APPNAME)-$(DEVICE)-test.prg: $(SOURCES) $(RESFILES) manifest.xml
 	@rm -rf bin/work/$(@F)
 
 sim:
-	@pgrep -f "$(SDK_HOME)/bin/simulator" >/dev/null 2>&1 || ( $(SIMULATOR) & sleep 3 )
+	@pgrep -f "$(SDK_HOME)/bin/simulator" >/dev/null 2>&1 || ( $(SIMULATOR) & sleep 6 )
 
 run: sim bin/$(APPNAME)-$(DEVICE).prg
 	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE).prg $(DEVICE) &

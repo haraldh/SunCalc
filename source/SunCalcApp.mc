@@ -24,9 +24,8 @@ class SunCalcApp extends App.AppBase {
 
     //! Return the initial view of your application here
     function getInitialView() {
-        var view;
-        view = new SunCalcView();
-        return [ view, new SunCalcDelegate(view, false) ];
+        var view = new SunCalcRingView();
+        return [ view, new SunCalcRingDelegate(view) ];
     }
 
     // stripped via excludeAnnotations on devices without Ui.GlanceView
