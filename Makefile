@@ -8,7 +8,7 @@ SIMULATOR = LD_LIBRARY_PATH="$(SDK_HOME)/bin" "$(SDK_HOME)/bin/connectiq"
 MONKEYC = "$(SDK_HOME)/bin/monkeyc"
 MONKEYDO = "$(SDK_HOME)/bin/monkeydo"
 
-.PHONY: all build buildall deploy run test sim simcheck package clean printdevices printsupported
+.PHONY: all build buildall deploy run debug test sim simcheck package clean printdevices printsupported
 
 all: build
 
@@ -51,6 +51,17 @@ sim:
 
 run: sim bin/$(APPNAME)-$(DEVICE).prg
 	$(MONKEYDO) bin/$(APPNAME)-$(DEVICE).prg $(DEVICE) &
+
+# Source-level debugger (breakpoints, stepping, variable inspection);
+# needs the simulator running, hence the sim prerequisite.
+# Usage: make debug DEVICE=fenix8pro47mm, then e.g.
+#   (mdd) break SunCalcView.mc:69
+#   (mdd) run
+#   (mdd) print info
+debug: sim bin/$(APPNAME)-$(DEVICE).prg
+	"$(SDK_HOME)/bin/mdd" -d $(DEVICE) \
+	-e bin/$(APPNAME)-$(DEVICE).prg \
+	-x bin/$(APPNAME)-$(DEVICE).prg.debug.xml
 
 # monkeydo exits nonzero even when all tests pass, so grade the run by its
 # output instead
