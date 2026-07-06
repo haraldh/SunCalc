@@ -14,7 +14,10 @@ var RING_BANDS as Lang.Array<Lang.Array> = [
     [ ASTRO_DAWN, ASTRO_DUSK, -18.0 * 0.017453293, 0x0000AA ],
     [ NAUTIC_DAWN, NAUTIC_DUSK, -12.0 * 0.017453293, 0x0055AA ],
     [ DAWN, DUSK, -6.0 * 0.017453293, 0x55AAFF ],
-    [ SUNRISE, SUNSET, -0.833 * 0.017453293, 0xFFAA00 ]
+    // sunrise..golden hour end stays visible as the reddish rim between
+    // this band and the plain-day band above +6 degrees
+    [ SUNRISE, SUNSET, -0.833 * 0.017453293, 0xFF5500 ],
+    [ GOLDEN_HOUR_AM, GOLDEN_HOUR_PM, 6.0 * 0.017453293, 0xFFAA00 ]
 ];
 
 var RING_NIGHT = 0x000055;
@@ -68,17 +71,25 @@ class SunCalcRingView extends Ui.View {
         is24Hour = Sys.getDeviceSettings().is24Hour;
     }
 
-    function onLayout(dc) {
+    // Acquire the position every time the view appears (also when
+    // returning from the pager). getInfo() returns the last known fix
+    // synchronously; only when that is unavailable do we wait for the
+    // async one-shot callback. Registering the one-shot in onLayout()
+    // alone is unreliable - if it never delivers, the view is stuck on
+    // "Waiting for GPS".
+    function onShow() {
         var info = Pos.getInfo();
-        if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
-            Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:setPosition));
-        } else {
+        if (info != null && info.position != null
+            && info.accuracy != Pos.QUALITY_NOT_AVAILABLE) {
             setPosition(info);
+        } else {
+            Pos.enableLocationEvents(Pos.LOCATION_ONE_SHOT, method(:setPosition));
         }
     }
 
     function setPosition(info as Pos.Info) as Void {
-        if (info == null || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
+        if (info == null || info.position == null
+            || info.accuracy == Pos.QUALITY_NOT_AVAILABLE) {
             return;
         }
         lastLoc = info.position.toRadians();
