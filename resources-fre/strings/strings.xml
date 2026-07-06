@@ -1,5 +1,7 @@
 <strings>
-    <!-- brand strings (AppName/AppVersion) live only in the base file -->
+    <!-- AppName repeated per language: Garmin Express does not fall back to
+         the base string, so an untranslated name would render blank -->
+    <string id="AppName">SunCalc</string>
     <string id="WaitingForGPS">En attente du GPS</string>
     <string id="NothingToDisplay">Rien à afficher</string>
     <string id="PressMenu">Appuyer sur Menu</string>

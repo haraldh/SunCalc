@@ -54,7 +54,7 @@ function topicFor(key, def) {
 // getConfig) but Application.Storage is not available there and crashes it.
 // lastLat/lastLng are declared in settings.xml with an out-of-range sentinel
 // default so an unset value is distinguishable from a real fix.
-function saveLoc(loc) {
+function saveLoc(loc as Lang.Array) {
     try {
         App.Properties.setValue("lastLat", loc[0]);
         App.Properties.setValue("lastLng", loc[1]);

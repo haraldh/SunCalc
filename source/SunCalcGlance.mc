@@ -132,7 +132,7 @@ class SunCalcGlanceView extends Ui.GlanceView {
 
         // today's events for the silhouette (calculate() from `now`)
         sc.calculate(now, loc, NOON);
-        var lat = loc[0];
+        var lat = (loc as Lang.Array)[0];
         var noonAlt = Math.PI / 2.0 - (lat - sc.dec).abs();
 
         // base = night; bands mirror the ring's warm/blue tiers exactly
