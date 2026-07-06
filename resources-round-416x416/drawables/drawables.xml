@@ -1,0 +1,19 @@
+<drawables>
+		<drawable-list id="Arrow_updown">
+			<shape type="polygon" points="[[208,9], [189,26], [227,26]]" color="Gfx.COLOR_BLACK" />
+			<shape type="polygon" points="[[208,407], [189,390], [227,390]]" color="Gfx.COLOR_BLACK" />
+		</drawable-list>
+		<drawable-list id="Arrow_right">
+			<shape type="polygon" points="[[199,26], [199,61], [216,43]]" color="Gfx.COLOR_BLACK" />
+		</drawable-list>
+
+	    <drawable-list id="gray_horizontal_up_bar">
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="78" width="fill" height="2" />
+	    </drawable-list>
+	    <drawable-list id="gray_horizontal_down_bar">
+	    	<shape type="rectangle" color="Gfx.COLOR_DK_GRAY" x="0" y="338" width="fill" height="2" />
+	    </drawable-list>
+	    <drawable-list id="white_background">
+	        <shape type="rectangle" color="Gfx.COLOR_WHITE" x="0" y="0" width="fill" height="fill" />
+	    </drawable-list>
+</drawables>

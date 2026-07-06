@@ -29,6 +29,12 @@ class SunCalcApp extends App.AppBase {
         return [ view, new SunCalcDelegate(view, false) ];
     }
 
+    // stripped via excludeAnnotations on devices without Ui.GlanceView
+    (:hasGlance)
+    function getGlanceView() {
+        return [ new SunCalcGlanceView() ];
+    }
+
     function onSettingsChanged() {
         for (var i = 0; i < DISPLAY.size(); i++) {
            DISPLAY[i][D_SHOW] = getPropertyDef(DISPLAY[i][D_PROP], true);

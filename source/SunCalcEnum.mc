@@ -1,6 +1,7 @@
 // emacs does not like enum in c-mode without a semicolon at the end
 // so this gets an extra file
 
+(:glance)
 enum {
     ASTRO_DAWN,
     NAUTIC_DAWN,

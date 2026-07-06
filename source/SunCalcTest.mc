@@ -267,6 +267,14 @@ function testPolarDaySelection(logger) {
     return true;
 }
 
+// only exists on glance-capable devices (stripped elsewhere with the
+// rest of the :hasGlance code)
+(:test :hasGlance)
+function testGlanceViewLoads(logger) {
+    var g = new SunCalcGlanceView();
+    return g != null;
+}
+
 (:test)
 function testMomentToStringNull(logger) {
     var sc = new SunCalc();

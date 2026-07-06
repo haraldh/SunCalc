@@ -3,6 +3,7 @@ using Toybox.Time as Time;
 using Toybox.Position as Pos;
 using Toybox.Lang;
 
+(:glance)
 class SunCalc {
 
     hidden const PI   = Math.PI,
