@@ -185,9 +185,15 @@ a release.
    user language, not internal fixes or refactors. Keep the history of
    earlier versions below the new entry, in the existing format
    (`V14:` / `* more devices`). Description, screenshots and device icons
-   are edited under the app's details. Screenshots: the simulator's File →
-   Save Screen Capture (screen only, no device frame), with Settings →
-   Set Position at a place with all twilight phases (e.g. Munich).
+   are edited under the app's details ("Edit Details"):
+   - screenshots (max. 5, JPG < 150 kB): simulator window with the device
+     frame, cropped on white, 800 px high; set Settings → Set Position
+     (e.g. Munich) and Set GPS Quality first
+   - hero image (1440×720, < 2 MB), cover image (500×500 app icon) and
+     the device icons (128×128, 64-colour and 24-bit, transparent
+     corners), all rendered from `SunCalc-icon.svg`
+   The current assets are not in the repo; keep the cover image's file
+   input apart from the first screenshot's when automating the form.
 
 ## Where users report problems
 
