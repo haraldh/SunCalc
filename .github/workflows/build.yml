@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/matco/connectiq-tester:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install make
+        # procps: `make test` uses pgrep to find a running simulator
+        run: apt-get update && apt-get install -y make procps
+
+      - name: Generate developer key
+        run: |
+          openssl genrsa -out /tmp/developer_key.pem 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/developer_key.pem -out /tmp/developer_key.der -nocrypt
+
+      - name: Skip devices the image does not know yet
+        env:
+          HOME: /root
+        run: .github/scripts/prune-unknown-devices.sh
+
+      - name: Build SunCalc (default device)
+        run: |
+          make build SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der
+
+      - name: Run unit tests
+        env:
+          # The image keeps the simulator's device and font files in
+          # /root/.Garmin; GitHub sets HOME to /github/home in containers.
+          HOME: /root
+        run: |
+          export DISPLAY=:1
+          Xvfb "$DISPLAY" -screen 0 1280x1024x24 &
+          /connectiq/bin/simulator > /dev/null 2>&1 &
+          sleep 5
+          # One device per kind of special case:
+          #   epix            API 1.2.1 (oldest), rectangular, no glance
+          #   fr235           semi-round, no glance
+          #   instinct2       1-bit monochrome, subscreen
+          #   marqadventurer  the maintainer's watch, glance
+          #   fenix8pro47mm   current AMOLED watch (the fenix847mm profile
+          #                   hangs in the SDK 9.3.0 simulator)
+          for device in epix fr235 instinct2 marqadventurer fenix8pro47mm; do
+            if ! grep -q "product id=\"$device\"" manifest.xml; then
+              echo "::warning::$device unknown to the CI image, tests skipped"
+              continue
+            fi
+            echo "::group::unit tests on $device"
+            make test DEVICE=$device SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der
+            echo "::endgroup::"
+          done
+
+      - name: Build the store package (all devices)
+        # One compiler run builds every device of the manifest, exactly what
+        # is uploaded to the Connect IQ store.
+        run: |
+          make package SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der
+
+      - name: Upload the store package
+        uses: actions/upload-artifact@v4
+        with:
+          name: suncalc-package
+          path: bin/*.iq
+          retention-days: 7
