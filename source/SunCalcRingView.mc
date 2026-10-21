@@ -92,6 +92,10 @@ class SunCalcRingView extends Ui.View {
     // radius in pixels, text rows in percent of the height
     var sunX, sunY, sunR;
     var subX = 0, subY = 0, subR = 0; // subscreen circle, subR 0 = none
+    // ring geometry: centre, band width, radius of the band's middle
+    var cx, cy, pen, ringR;
+    // extents of the drawn times, for the hour labels to stay clear of
+    var timesLeft, timesRight, timesBottom;
     var rows as Lang.Array<Lang.Number> = [ 42, 51, 63, 71 ];
 
     function initialize() {
@@ -149,11 +153,8 @@ class SunCalcRingView extends Ui.View {
         return deg < 0.0 ? deg + 360.0 : deg;
     }
 
-    hidden function drawRing(dc, w, h) {
-        var cx = w / 2;
-        var cy = h / 2;
-        var pen = w / 14;
-        var r = (w < h ? w : h) / 2 - pen / 2 - 1;
+    hidden function drawRing(dc) {
+        var r = ringR;
         var mono = monoScreen();
 
         if (mono) {
@@ -225,26 +226,29 @@ class SunCalcRingView extends Ui.View {
             }
         }
 
-        // hour marks inside the ring; each one is left out where it would
-        // run into the sun icon or the times (small and wide screens)
-        dc.setPenWidth(1);
+    }
+
+    // hour marks inside the ring; each one is left out where it would run
+    // into the sun icon or the times (small and wide screens)
+    hidden function drawHourLabels(dc) {
         dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
         var font = Gfx.FONT_XTINY;
         var fh = dc.getFontHeight(font);
-        var ri = r - pen / 2 - fh / 2 - 2;
-        if (mono) {
+        var ri = ringR - pen / 2 - fh / 2 - 2;
+        if (monoScreen()) {
             ri -= pen / 2; // keep clear of the now tick
         }
-        var timeW = dc.getTextWidthInPixels(is24Hour ? "00:00" : "00:00 AM", Gfx.FONT_MEDIUM);
-        var labelW = dc.getTextWidthInPixels("06", font);
-        var sideFree = cx - ri + labelW / 2 + 2 < (w * 32) / 100 - timeW / 2;
-        var topFree = sunX != cx || cy - ri + fh / 2 < sunY - sunR - 6;
-        var bottomFree = cy + ri - fh / 2
-            > (h * rows[3]) / 100 + dc.getFontHeight(Gfx.FONT_SMALL) / 2;
+        // half the label plus half a label of air to the times
+        var halfW = dc.getTextWidthInPixels("06", font);
+        var free = [
+            sunX != cx || cy - ri + fh / 2 < sunY - sunR - 6, // 12
+            cx + ri - halfW > timesRight,                       // 18
+            cy + ri - fh / 2 > timesBottom,                     // 24
+            cx - ri + halfW < timesLeft                         // 06
+        ];
         var labels = [ "12", "18", "24", "06" ]; // top, right, bottom, left
         for (var i = 0; i < 4; i++) {
-            if ((i == 0 && !topFree) || (i % 2 == 1 && !sideFree)
-                || (i == 2 && !bottomFree)) {
+            if (!free[i]) {
                 continue;
             }
             var a = (90 - i * 90) * Math.PI / 180.0;
@@ -293,7 +297,7 @@ class SunCalcRingView extends Ui.View {
             ? now
             : new Time.Moment(now.value() + dayOffset * Time.Gregorian.SECONDS_PER_DAY);
         var headY = layout(w, h);
-        drawRing(dc, w, h);
+        drawRing(dc);
         if (subR > 0) {
             // the ring passes under the subscreen lens: keep the lens for
             // the sun and the heading only
@@ -315,14 +319,25 @@ class SunCalcRingView extends Ui.View {
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
 
         // two user-selectable topic rows (defaults: Sunrise/Sunset, Civil)
-        drawRow(dc, w, rows[0], rows[1], Gfx.FONT_MEDIUM, topicFor("ringTop", 0));
-        drawRow(dc, w, rows[2], rows[3], Gfx.FONT_SMALL, topicFor("ringBottom", 1));
+        timesLeft = cx;
+        timesRight = cx;
+        timesBottom = cy;
+        drawRow(dc, rows[0], rows[1], 3, topicFor("ringTop", 0));
+        drawRow(dc, rows[2], rows[3], 2, topicFor("ringBottom", 1));
+        drawHourLabels(dc);
     }
 
     // Place the sun icon, the day heading and the text rows; returns the
     // heading's y. On watches with a subscreen (Instinct) the sun and the
     // heading go into the subscreen and the rows move down, out of its way.
     hidden function layout(w, h) {
+        // the ring fills the shorter side; on wide screens (epix) the text
+        // has to fit inside it, not into the screen width
+        var d = w < h ? w : h;
+        cx = w / 2;
+        cy = h / 2;
+        pen = d / 14;
+        ringR = d / 2 - pen / 2 - 1;
         var sub = null;
         if (Ui has :getSubscreen) {
             sub = Ui.getSubscreen();
@@ -340,14 +355,16 @@ class SunCalcRingView extends Ui.View {
         subR = 0;
         sunX = w / 2;
         sunY = (h * 23) / 100;
-        sunR = w / 40 + 2;
+        sunR = d / 40 + 2;
         rows = [ 42, 51, 63, 71 ];
         return (h * 32) / 100;
     }
 
     // one ring text row: centered topic title with the morning / evening
     // times of that topic beneath it. yTitle / yTime are percent of height.
-    hidden function drawRow(dc, w, yTitle, yTime, font, topicIdx) {
+    // The times use font size maxFont (index into fonts below) or smaller,
+    // whatever fits into the ring at that height and under the title.
+    hidden function drawRow(dc, yTitle, yTime, maxFont, topicIdx) {
         var t = TOPICS[topicIdx] as Lang.Array;
         var h = dc.getHeight();
         // Built here, not at module scope: a global initialized with
@@ -355,18 +372,60 @@ class SunCalcRingView extends Ui.View {
         var titleRes = [ Rez.Strings.topicSun, Rez.Strings.topicCivil,
                          Rez.Strings.topicNautic, Rez.Strings.topicAstro,
                          Rez.Strings.topicBlue, Rez.Strings.topicGolden ];
+        var fonts = [ Gfx.FONT_XTINY, Gfx.FONT_TINY, Gfx.FONT_SMALL, Gfx.FONT_MEDIUM ];
         dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, (h * yTitle) / 100, Gfx.FONT_XTINY,
+        dc.drawText(cx, (h * yTitle) / 100, Gfx.FONT_XTINY,
                     Ui.loadResource(titleRes[topicIdx]),
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        var am = sc.calculate(ref, lastLoc, t[T_AM]);
-        var pm = sc.calculate(ref, lastLoc, t[T_PM]);
-        dc.drawText((w * 32) / 100, (h * yTime) / 100, font,
-                    sc.momentToString(am, is24Hour, false),
+        var am = sc.momentToString(sc.calculate(ref, lastLoc, t[T_AM]), is24Hour, false);
+        var pm = sc.momentToString(sc.calculate(ref, lastLoc, t[T_PM]), is24Hour, false);
+
+        var y = (h * yTime) / 100;
+        // room between the title's and the times' centres
+        var gapY = y - (h * yTitle) / 100 - dc.getFontHeight(Gfx.FONT_XTINY) / 2;
+        var rin = ringR - pen / 2 - 2;
+        var font = fonts[0];
+        var tw = 0;
+        var chord = 0;
+        for (var f = maxFont; f >= 0; f--) {
+            font = fonts[f];
+            var tw1 = dc.getTextWidthInPixels(am, font);
+            var tw2 = dc.getTextWidthInPixels(pm, font);
+            tw = tw1 > tw2 ? tw1 : tw2;
+            // width of the ring's inside at the row's top or bottom edge
+            var dy = (y - cy).abs() + dc.getFontHeight(font) / 2;
+            chord = dy < rin ? 2 * Math.sqrt(rin * rin - dy * dy) : 0;
+            if (2 * tw + tw / 4 <= chord && dc.getFontHeight(font) / 2 <= gapY + 2) {
+                break;
+            }
+        }
+        // 18% of the ring diameter apart, pulled in where the ring's inside
+        // is narrower at that height
+        var dx = ((2 * ringR + pen) * 18) / 100;
+        if (dx > chord / 4) {
+            dx = (chord / 4).toNumber();
+        }
+        if (dx < tw / 2 + tw / 8) {
+            dx = tw / 2 + tw / 8;
+        }
+        dc.drawText(cx - dx, y, font, am,
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText((w * 68) / 100, (h * yTime) / 100, font,
-                    sc.momentToString(pm, is24Hour, false),
+        dc.drawText(cx + dx, y, font, pm,
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+
+        var fh2 = dc.getFontHeight(font) / 2;
+        // only the row next to the side labels limits them
+        if ((y - cy).abs() < fh2 + dc.getFontHeight(Gfx.FONT_XTINY)) {
+            if (cx - dx - tw / 2 < timesLeft) {
+                timesLeft = cx - dx - tw / 2;
+            }
+            if (cx + dx + tw / 2 > timesRight) {
+                timesRight = cx + dx + tw / 2;
+            }
+        }
+        if (y + fh2 > timesBottom) {
+            timesBottom = y + fh2;
+        }
     }
 }
 
