@@ -51,15 +51,31 @@ jobs:
           #   instinct2       1-bit monochrome, subscreen
           #   marqadventurer  the maintainer's watch, glance
           #   fenix8pro47mm   current AMOLED watch
+          # The simulator sometimes hangs (or crashes) right after the
+          # device changes; a second run of the same device then works.
+          failed=""
           for device in epix fr235 instinct2 marqadventurer fenix8pro47mm; do
             if ! grep -q "product id=\"$device\"" manifest.xml; then
               echo "::warning::$device unknown to the CI image, tests skipped"
               continue
             fi
             echo "::group::unit tests on $device"
-            make test DEVICE=$device SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der
+            ok=""
+            for attempt in 1 2; do
+              pkill -f "monkeydo|MonkeyDoDeux" || true
+              if timeout 300 make test DEVICE=$device SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der; then
+                ok=1
+                break
+              fi
+              echo "::warning::unit tests on $device failed or hung (attempt $attempt)"
+            done
             echo "::endgroup::"
+            [ -n "$ok" ] || failed="$failed $device"
           done
+          if [ -n "$failed" ]; then
+            echo "::error::unit tests failed on:$failed"
+            exit 1
+          fi
 
       - name: Build the store package (all devices)
         # One compiler run builds every device of the manifest, exactly what
