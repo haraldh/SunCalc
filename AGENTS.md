@@ -6,6 +6,68 @@ hour, solar noon. Front page is a 24h twilight ring; Enter opens the
 period pager; on Connect IQ 4+ devices a glance shows the next sunrise or
 sunset. User-facing docs: `docs/USER_GUIDE.md`.
 
+## Architecture
+
+Widget (`type="widget"` in `manifest.xml`); on Connect IQ 4+ devices it
+runs as a super app with a glance. No phone connection, no network: all it
+needs is a position.
+
+### Source files
+
+- **SunCalc.mc**: the sun algorithm (`SunCalc.calculate(moment, [lat,
+  lng] in radians, event)`, a port of the suncalc.js algorithm), returns a
+  `Time.Moment` or `null` when the sun never reaches that altitude that
+  day (polar day/night). Caches the per-day values (`dec`, `Jnoon`, ...)
+  by day and longitude. `momentToString` formats 12/24h with a "+N" day
+  offset.
+- **SunCalcEnum.mc**: event ids (`ASTRO_DAWN` .. `ASTRO_DUSK`, `NOON` in
+  the middle: events before it are morning, after it evening; the
+  `TIMES` altitude table in SunCalc.mc mirrors this order), the
+  `DISPLAY` row columns (`D_*`) and the topic columns (`T_*`).
+- **SunCalcApp.mc**: `SunCalcApp` (initial view = ring, `getGlanceView`
+  under `(:hasGlance)`), the global app instance `AB` and
+  `getPropertyDef()` for the pager's show/hide properties.
+- **SunCalcRingView.mc**: front page. `ringSegments()` turns the
+  `RING_BANDS` (astro, nautic, civil, blue hour, sunrise, golden hour) into
+  `[dawnFrac, duskFrac]`, `:full` or `null` per band; the view draws the
+  24h ring (noon at the top), current-time arc, solar noon/midnight ticks
+  and two topic rows. Up/Down scroll days (`dayOffset`), Enter/tap pushes
+  the pager. Acquires GPS itself and saves the fix with `saveLoc()`.
+- **SunCalcView.mc**: the period pager (`DISPLAY` table: one row per
+  period with from/to events, menu id, AM/PM and its `show*` property).
+  `selectDisplay()` picks the current period, walking into the next day
+  and skipping hidden or non-existent (polar) periods. Menu opens the
+  show/hide menu (**SunCalcMenu.mc**).
+- **SunCalcTopics.mc**: the `TOPICS` table (pairs of morning/evening
+  events used by ring rows and glance; its index order is stored in the
+  `ringTop`/`ringBottom`/`glanceTopic` properties and mirrors the
+  `listEntry` order in `settings.xml`, so it is API: only append),
+  property helpers (`readProperty`, `writeProperty`, `getConfig`,
+  `topicFor`) and the saved position (`saveLoc`, `loadStoredLoc`).
+- **SunCalcGlance.mc**: `SunCalcGlanceView` (`(:glance :hasGlance)`):
+  countdown to the next event of the glance topic, a twilight bar and the
+  topic's times. Uses `Pos.getInfo()` or the saved position; never starts
+  GPS.
+- **SunCalcTest.mc**: unit tests.
+
+### Settings and properties
+
+`resources/settings.xml`: `darkMode`, `ringTop`, `ringBottom`,
+`glanceTopic` (indices into `TOPICS`), the `show*` switches of the pager
+rows, and the hidden `lastLat`/`lastLng` (radians, 999 = unset) the glance
+falls back on. Values from Garmin Connect arrive via
+`onSettingsChanged()`.
+
+### Localization
+
+`resources/strings/strings.xml` is English and the fallback;
+`resources-<lang>/strings/strings.xml` for deu, fre, spa, ita, dut, por.
+A new language needs its folder and an entry in `<iq:languages>` in
+`manifest.xml` (`gen-devices.py` keeps that block), or monkeyc ignores
+the folder. Strings the glance uses carry `scope="glance"` (the `g*` ids),
+in every language file. `AppVersion` is only in the base file and carries
+the `x-release-please-version` marker.
+
 ## Build and test
 
 The Nix devShell provides the JDK (and on Linux the SDK itself); on macOS
@@ -101,10 +163,14 @@ a release.
    lack the newest devices).
 3. Upload `bin/SunCalc.iq` in the Connect IQ developer dashboard
    (https://apps.garmin.com/developer/dashboard).
-4. "What's new": only what users of the last published version notice, in
+4. Store versions are named "V<major>" (V14 was the last before
+   release-please); use "V<x.y.z>" from now on. "What's new": only what users of the last published version notice, in
    user language, not internal fixes or refactors. Keep the history of
-   earlier versions below the new entry. Description, screenshots and
-   device icons are edited under the app's details.
+   earlier versions below the new entry, in the existing format
+   (`V14:` / `* more devices`). Description, screenshots and device icons
+   are edited under the app's details. Screenshots: the simulator's File →
+   Save Screen Capture (screen only, no device frame), with Settings →
+   Set Position at a place with all twilight phases (e.g. Munich).
 
 ## Where users report problems
 
