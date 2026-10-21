@@ -148,7 +148,10 @@ subscreen), `marqadventurer` (the maintainer's watch), `fenix8pro47mm`
 (AMOLED). Add a device there when a new kind of special case appears
 instead of testing everything. The image lags behind the SDK;
 `.github/scripts/prune-unknown-devices.sh` drops devices it does not know
-yet, so the CI package is not the store package.
+yet, so the CI package is not the store package. Each device gets 90 s
+and one retry in a freshly started simulator, because the simulator hangs
+after some device switches (fenix8pro47mm after marqadventurer, every
+run); a device that fails twice fails the job.
 
 Simulator on macOS: one device at a time, `pkill -f
 "monkeydo|MonkeyDoDeux"` before each run, rebuild before running. The
