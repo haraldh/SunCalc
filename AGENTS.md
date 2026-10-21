@@ -189,9 +189,10 @@ a release.
    - screenshots (max. 5, JPG < 150 kB): simulator window with the device
      frame, cropped on white, 800 px high; set Settings → Set Position
      (e.g. Munich) and Set GPS Quality first
-   - hero image (1440×720, < 2 MB), cover image (500×500 app icon) and
-     the device icons (128×128, 64-colour and 24-bit, transparent
-     corners), all rendered from `SunCalc-icon.svg`
+   - hero image (1440×720, < 2 MB): icon, name and tagline on a twilight
+     gradient next to two framed screenshots
+   - cover image (500×500) and device icons (128×128, 64-colour and
+     24-bit), rendered from `SunCalc-icon.svg` with transparent corners
    The current assets are not in the repo; keep the cover image's file
    input apart from the first screenshot's when automating the form.
 
