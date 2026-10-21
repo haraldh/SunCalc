@@ -109,7 +109,13 @@ nix shell nixpkgs#librsvg -c python3 tools/gen-devices.py
 Run it after updating the SDK/devices in the SDK manager, then build the
 new devices and check a few in the simulator. Views draw themselves
 relative to the screen size, so a new device needs no layout resources.
-Devices without glance get `excludeAnnotations = hasGlance`.
+Devices without glance get `excludeAnnotations = hasGlance`. Every device
+keeps exactly one of `:color` / `:mono` (1-bit screens: Instinct 2/2S/2X/
+3 Solar/Crossover/E, Descent G1), which picks the ring drawing
+(`monoScreen()`); since a device entry replaces
+`base.excludeAnnotations`, the generator repeats it per device.
+Watches with a subscreen (`WatchUi.getSubscreen()`) show the sun icon and
+the day in the subscreen and keep the ring out of it.
 
 ## Pitfalls
 
