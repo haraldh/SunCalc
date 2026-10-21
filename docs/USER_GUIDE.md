@@ -35,6 +35,21 @@ Below the sun icon:
   and the bottom row is *Civil Twilight*. Both rows are configurable
   (see [Settings](#settings)).
 
+On small or wide screens, hour labels that would collide with the times are
+left out.
+
+### Black-and-white watches (Instinct, Descent G1)
+
+These screens cannot show the colours, so the ring shows **how high the sun
+is by its width** instead: a thin line at night, getting wider through the
+astronomical, nautical and civil twilight and the blue hour, and the full
+width while the sun is up. The current time is a short tick on the inside of
+the ring.
+
+On watches with the small round **subscreen** (Instinct 2, 3 and E, Descent
+G1) the sun icon and **TODAY** (or the date) are shown in the subscreen, and
+the ring leaves it free.
+
 ---
 
 ## Scroll through the days

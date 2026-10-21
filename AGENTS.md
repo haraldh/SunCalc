@@ -203,6 +203,8 @@ Check both now and then, and always before a release:
 - GitHub issues: https://github.com/haraldh/SunCalc/issues
 - Connect IQ store reviews:
   https://apps.garmin.com/apps/87b86650-a443-43ea-9dcb-29e4051a5722
+- Garmin forum thread (also update its first post for big releases):
+  https://forums.garmin.com/developer/connect-iq/f/showcase/3082/widget-suncalc---sunrise-sunset-blue-hour-golden-hour/
 
 Answer in the reporter's language. Replies are public: show the text to
 the maintainer before posting, and do not close issues without approval.
