@@ -1,0 +1,11 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "include-v-in-tag": true,
+      "extra-files": [
+        "resources/strings/strings.xml"
+      ]
+    }
+  }
+}

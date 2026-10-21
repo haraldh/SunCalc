@@ -1,0 +1,55 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+
+  build-release:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/matco/connectiq-tester:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install make
+        run: apt-get update && apt-get install -y make
+
+      - name: Generate developer key
+        run: |
+          openssl genrsa -out /tmp/developer_key.pem 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER -in /tmp/developer_key.pem -out /tmp/developer_key.der -nocrypt
+
+      - name: Skip devices the image does not know yet
+        env:
+          HOME: /root
+        run: .github/scripts/prune-unknown-devices.sh
+
+      - name: Build package
+        run: |
+          make package SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der
+
+      - name: Upload release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apt-get install -y gh git
+          gh release upload ${{ needs.release-please.outputs.tag_name }} bin/*.iq
