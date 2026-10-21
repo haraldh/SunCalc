@@ -54,9 +54,10 @@ jobs:
           #   instinct2       1-bit monochrome, subscreen
           #   marqadventurer  the maintainer's watch, glance
           #   fenix8pro47mm   current AMOLED watch
-          # The simulator sometimes hangs (or crashes) right after the
-          # device changes; a second run of the same device, in a freshly
-          # started simulator, then works.
+          # The simulator sometimes hangs right after the device changes
+          # (fenix8pro47mm after marqadventurer, every time so far); a
+          # second run of the same device, in a freshly started simulator,
+          # then works. A device normally takes about 15 s.
           failed=""
           for device in epix fr235 instinct2 marqadventurer fenix8pro47mm; do
             if ! grep -q "product id=\"$device\"" manifest.xml; then
@@ -72,7 +73,7 @@ jobs:
                 sleep 2
                 start_simulator
               fi
-              if timeout 300 make test DEVICE=$device SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der; then
+              if timeout 90 make test DEVICE=$device SDK_HOME=/connectiq PRIVATE_KEY=/tmp/developer_key.der; then
                 ok=1
                 break
               fi
