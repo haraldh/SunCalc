@@ -178,7 +178,7 @@ Check both now and then, and always before a release:
 
 - GitHub issues: https://github.com/haraldh/SunCalc/issues
 - Connect IQ store reviews:
-  https://apps.garmin.com/en-US/apps/87b86650-a443-43ea-9dcb-29e4051a5722
+  https://apps.garmin.com/apps/87b86650-a443-43ea-9dcb-29e4051a5722
 
 Answer in the reporter's language. Replies are public: show the text to
 the maintainer before posting, and do not close issues without approval.
