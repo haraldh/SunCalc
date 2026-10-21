@@ -7,8 +7,9 @@ a widget (natively, or as a super app on CIQ >= 4) and rewrites:
 
   - manifest.xml            <iq:products> list
   - monkey.jungle           per-device launcher icon resourcePath +
-                            excludeAnnotations=hasGlance for devices
-                            without glance support
+                            excludeAnnotations: hasGlance for devices
+                            without glance support, and mono/color to
+                            pick the 1-bit or the colour ring drawing
   - resources-launcher-*/   launcher_icon.png rendered from
                             SunCalc-icon.svg (requires rsvg-convert,
                             e.g. `nix shell nixpkgs#librsvg`)
@@ -43,7 +44,8 @@ def scan():
         li = j.get("launcherIcon", {})
         wear.append(dict(id=d, fam=j.get("deviceFamily"),
                          launcher=f'{li.get("width")}x{li.get("height")}',
-                         glance="glance" in types))
+                         glance="glance" in types,
+                         mono=j.get("bitsPerPixel") == 1))
     return wear
 
 def gen_launcher(size):
@@ -83,13 +85,20 @@ def main():
     for w in sorted(wear, key=lambda x: x["id"]):
         lines.append(f'{w["id"]}.resourcePath = resources-launcher-{w["launcher"]};$({w["id"]}.resourcePath)')
     lines.append("")
-    lines.append("# no Ui.GlanceView on these devices - strip the glance code")
+    lines.append("# every device keeps exactly one of :color / :mono (1-bit screens)")
+    lines.append("base.excludeAnnotations = mono")
+    lines.append("")
+    lines.append("# no Ui.GlanceView on these devices - strip the glance code; a device")
+    lines.append("# entry replaces base.excludeAnnotations, so repeat mono/color here")
     for w in sorted(wear, key=lambda x: x["id"]):
-        if not w["glance"]:
-            lines.append(f'{w["id"]}.excludeAnnotations = hasGlance')
+        excl = ([] if w["glance"] else ["hasGlance"]) + ["color" if w["mono"] else "mono"]
+        if excl != ["mono"]:
+            lines.append(f'{w["id"]}.excludeAnnotations = {";".join(excl)}')
     open(os.path.join(REPO, "monkey.jungle"), "w").write("\n".join(lines) + "\n")
     nog = sum(1 for w in wear if not w["glance"])
-    print(f"manifest: {len(wear)} products; jungle: {len(wear)} launcher mappings, {nog} glance exclusions")
+    nmono = sum(1 for w in wear if w["mono"])
+    print(f"manifest: {len(wear)} products; jungle: {len(wear)} launcher mappings, "
+          f"{nog} glance exclusions, {nmono} 1-bit screens")
 
 if __name__ == "__main__":
     main()

@@ -27,6 +27,23 @@ var RING_BANDS as Lang.Array<Lang.Array> = [
 
 var RING_NIGHT = 0x000055;
 
+// 1-bit screens (Instinct, Descent G1) cannot tell the band colours apart:
+// there the ring shows the sun's height as band width instead, from a
+// hairline at night to the full ring width while the sun is up. Exactly
+// one of these survives per device (excludeAnnotations in monkey.jungle).
+(:color)
+function monoScreen() {
+    return false;
+}
+
+(:mono)
+function monoScreen() {
+    return true;
+}
+
+// band width on 1-bit screens, in sixths of the ring width, per RING_BANDS
+var RING_MONO_SIXTHS as Lang.Array<Lang.Number> = [ 1, 2, 3, 4, 6, 6 ];
+
 // fraction of the local day [0..1) for a moment
 function ringDayFrac(moment) {
     var t = Time.Gregorian.info(moment, Time.FORMAT_SHORT);
@@ -71,6 +88,11 @@ class SunCalcRingView extends Ui.View {
     var lastLoc;
     var is24Hour;
     var fgColor; // foreground, follows the dark/light theme
+    // layout of the current frame (see layout()): sun icon centre and
+    // radius in pixels, text rows in percent of the height
+    var sunX, sunY, sunR;
+    var subX = 0, subY = 0, subR = 0; // subscreen circle, subR 0 = none
+    var rows as Lang.Array<Lang.Number> = [ 42, 51, 63, 71 ];
 
     function initialize() {
         View.initialize();
@@ -132,10 +154,18 @@ class SunCalcRingView extends Ui.View {
         var cy = h / 2;
         var pen = w / 14;
         var r = (w < h ? w : h) / 2 - pen / 2 - 1;
+        var mono = monoScreen();
 
-        dc.setPenWidth(pen);
-        dc.setColor(RING_NIGHT, Gfx.COLOR_TRANSPARENT);
-        dc.drawCircle(cx, cy, r);
+        if (mono) {
+            // night: a hairline along the outer edge
+            dc.setPenWidth(1);
+            dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
+            dc.drawCircle(cx, cy, r + pen / 2);
+        } else {
+            dc.setPenWidth(pen);
+            dc.setColor(RING_NIGHT, Gfx.COLOR_TRANSPARENT);
+            dc.drawCircle(cx, cy, r);
+        }
 
         var segs = ringSegments(sc, ref, lastLoc);
         for (var i = 0; i < segs.size(); i++) {
@@ -144,12 +174,24 @@ class SunCalcRingView extends Ui.View {
                 break; // darker than this everywhere; inner bands too
             }
             var band = RING_BANDS[i] as Lang.Array;
-            dc.setColor(band[3] as Lang.Number, Gfx.COLOR_TRANSPARENT);
+            var br = r;
+            if (mono) {
+                // all bands share the outer edge and grow inwards
+                var bw = (pen * RING_MONO_SIXTHS[i]) / 6;
+                if (bw < 1) {
+                    bw = 1;
+                }
+                br = r + pen / 2 - bw / 2;
+                dc.setPenWidth(bw);
+                dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
+            } else {
+                dc.setColor(band[3] as Lang.Number, Gfx.COLOR_TRANSPARENT);
+            }
             if (seg == :full) {
-                dc.drawCircle(cx, cy, r);
+                dc.drawCircle(cx, cy, br);
             } else {
                 var pair = seg as Lang.Array;
-                dc.drawArc(cx, cy, r, Gfx.ARC_CLOCKWISE,
+                dc.drawArc(cx, cy, br, Gfx.ARC_CLOCKWISE,
                            fracToDeg(pair[0]), fracToDeg(pair[1]));
             }
         }
@@ -162,25 +204,49 @@ class SunCalcRingView extends Ui.View {
             var midF = noonF + 0.5;
             if (midF >= 1.0) { midF -= 1.0; }
             dc.setPenWidth(2);
-            drawTick(dc, cx, cy, fracToDeg(noonF), r - pen / 2, r + pen / 2, Gfx.COLOR_BLACK);
-            drawTick(dc, cx, cy, fracToDeg(midF), r - pen / 2, r + pen / 2, Gfx.COLOR_LT_GRAY);
+            drawTick(dc, cx, cy, fracToDeg(noonF), r - pen / 2, r + pen / 2,
+                     mono && !getConfig("darkMode", true) ? Gfx.COLOR_WHITE : Gfx.COLOR_BLACK);
+            if (!mono) {
+                drawTick(dc, cx, cy, fracToDeg(midF), r - pen / 2, r + pen / 2, Gfx.COLOR_LT_GRAY);
+            }
         }
 
         // current time marker - only meaningful on today
         if (dayOffset == 0) {
-            dc.setPenWidth(pen + 4);
-            dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
             var nowDeg = fracToDeg(ringDayFrac(now));
-            dc.drawArc(cx, cy, r, Gfx.ARC_CLOCKWISE, nowDeg + 2, nowDeg - 2);
+            if (mono) {
+                // red is invisible on 1-bit screens: a tick inside the ring
+                dc.setPenWidth(3);
+                drawTick(dc, cx, cy, nowDeg, r - pen / 2 - pen / 2, r - pen / 2 - 1, fgColor);
+            } else {
+                dc.setPenWidth(pen + 4);
+                dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
+                dc.drawArc(cx, cy, r, Gfx.ARC_CLOCKWISE, nowDeg + 2, nowDeg - 2);
+            }
         }
 
-        // hour marks inside the ring
+        // hour marks inside the ring; each one is left out where it would
+        // run into the sun icon or the times (small and wide screens)
         dc.setPenWidth(1);
         dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
         var font = Gfx.FONT_XTINY;
-        var ri = r - pen / 2 - dc.getFontHeight(font) / 2 - 2;
+        var fh = dc.getFontHeight(font);
+        var ri = r - pen / 2 - fh / 2 - 2;
+        if (mono) {
+            ri -= pen / 2; // keep clear of the now tick
+        }
+        var timeW = dc.getTextWidthInPixels(is24Hour ? "00:00" : "00:00 AM", Gfx.FONT_MEDIUM);
+        var labelW = dc.getTextWidthInPixels("06", font);
+        var sideFree = cx - ri + labelW / 2 + 2 < (w * 32) / 100 - timeW / 2;
+        var topFree = sunX != cx || cy - ri + fh / 2 < sunY - sunR - 6;
+        var bottomFree = cy + ri - fh / 2
+            > (h * rows[3]) / 100 + dc.getFontHeight(Gfx.FONT_SMALL) / 2;
         var labels = [ "12", "18", "24", "06" ]; // top, right, bottom, left
         for (var i = 0; i < 4; i++) {
+            if ((i == 0 && !topFree) || (i % 2 == 1 && !sideFree)
+                || (i == 2 && !bottomFree)) {
+                continue;
+            }
             var a = (90 - i * 90) * Math.PI / 180.0;
             dc.drawText(cx + ri * Math.cos(a), cy - ri * Math.sin(a),
                         font, labels[i],
@@ -226,8 +292,15 @@ class SunCalcRingView extends Ui.View {
         ref = (dayOffset == 0)
             ? now
             : new Time.Moment(now.value() + dayOffset * Time.Gregorian.SECONDS_PER_DAY);
+        var headY = layout(w, h);
         drawRing(dc, w, h);
-        drawSun(dc, w / 2, (h * 23) / 100, w / 40 + 2);
+        if (subR > 0) {
+            // the ring passes under the subscreen lens: keep the lens for
+            // the sun and the heading only
+            dc.setColor(dark ? Gfx.COLOR_BLACK : Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+            dc.fillCircle(subX, subY, subR);
+        }
+        drawSun(dc, sunX, sunY, sunR);
 
         // "Today" on the current day, otherwise the day's date (DD.MM.)
         var head;
@@ -238,12 +311,38 @@ class SunCalcRingView extends Ui.View {
             head = di.day.format("%02d") + "." + di.month.format("%02d") + ".";
         }
         dc.setColor(fgColor, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, (h * 32) / 100, Gfx.FONT_XTINY, head,
+        dc.drawText(sunX, headY, Gfx.FONT_XTINY, head,
                     Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
 
         // two user-selectable topic rows (defaults: Sunrise/Sunset, Civil)
-        drawRow(dc, w, 42, 51, Gfx.FONT_MEDIUM, topicFor("ringTop", 0));
-        drawRow(dc, w, 63, 71, Gfx.FONT_SMALL, topicFor("ringBottom", 1));
+        drawRow(dc, w, rows[0], rows[1], Gfx.FONT_MEDIUM, topicFor("ringTop", 0));
+        drawRow(dc, w, rows[2], rows[3], Gfx.FONT_SMALL, topicFor("ringBottom", 1));
+    }
+
+    // Place the sun icon, the day heading and the text rows; returns the
+    // heading's y. On watches with a subscreen (Instinct) the sun and the
+    // heading go into the subscreen and the rows move down, out of its way.
+    hidden function layout(w, h) {
+        var sub = null;
+        if (Ui has :getSubscreen) {
+            sub = Ui.getSubscreen();
+        }
+        if (sub != null) {
+            subX = sub.x + sub.width / 2;
+            subY = sub.y + sub.height / 2;
+            subR = sub.width / 2 + 1;
+            sunX = subX;
+            sunY = sub.y + (sub.height * 33) / 100;
+            sunR = sub.width / 12 + 1;
+            rows = [ 46, 55, 68, 77 ];
+            return sub.y + (sub.height * 68) / 100;
+        }
+        subR = 0;
+        sunX = w / 2;
+        sunY = (h * 23) / 100;
+        sunR = w / 40 + 2;
+        rows = [ 42, 51, 63, 71 ];
+        return (h * 32) / 100;
     }
 
     // one ring text row: centered topic title with the morning / evening
