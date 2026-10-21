@@ -152,10 +152,11 @@ yet, so the CI package is not the store package.
 
 Simulator on macOS: one device at a time, `pkill -f
 "monkeydo|MonkeyDoDeux"` before each run, rebuild before running. The
-`fenix847mm` profile hangs in the SDK 9.3.0 simulator. Launching an
-API 1.x device (epix) right after a current one can crash with "Could not
-find symbol 'initResources'" and a stack in the other device's build
-directory: a simulator artifact, run it a second time. Set Settings → Set
+SDK 9.3.0 simulator sometimes stumbles when the device changes: it hangs
+on the Connect IQ loading triangle, or an API 1.x device (epix) right
+after a current one crashes with "Could not find symbol 'initResources'"
+and a stack in the other device's build directory. Run the same device a
+second time before suspecting the app. Set Settings → Set
 Position and Set GPS Quality, otherwise the views wait for GPS. Screen
 captures for the store: File → Save Screen Capture.
 

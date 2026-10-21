@@ -50,8 +50,7 @@ jobs:
           #   fr235           semi-round, no glance
           #   instinct2       1-bit monochrome, subscreen
           #   marqadventurer  the maintainer's watch, glance
-          #   fenix8pro47mm   current AMOLED watch (the fenix847mm profile
-          #                   hangs in the SDK 9.3.0 simulator)
+          #   fenix8pro47mm   current AMOLED watch
           for device in epix fr235 instinct2 marqadventurer fenix8pro47mm; do
             if ! grep -q "product id=\"$device\"" manifest.xml; then
               echo "::warning::$device unknown to the CI image, tests skipped"
