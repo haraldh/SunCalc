@@ -43,15 +43,16 @@ function ringSegments(sc, now, loc as Lang.Array<Lang.Double>) as Lang.Array {
     sc.calculate(now, loc, NOON); // ensure declination cache for noonAlt
     var lat = loc[0];
     var noonAlt = Math.PI / 2.0 - (lat - sc.dec).abs();
-    var segs = [] as Lang.Array;
+    // preallocated: Array.add() needs API 1.3 (epix has 1.2)
+    var segs = new [RING_BANDS.size()] as Lang.Array;
     for (var i = 0; i < RING_BANDS.size(); i++) {
         var band = RING_BANDS[i] as Lang.Array;
         var dawn = sc.calculate(now, loc, band[0]);
         var dusk = sc.calculate(now, loc, band[1]);
         if (dawn != null && dusk != null) {
-            segs.add([ringDayFrac(dawn), ringDayFrac(dusk)]);
+            segs[i] = [ringDayFrac(dawn), ringDayFrac(dusk)];
         } else {
-            segs.add(noonAlt > band[2] ? :full : null);
+            segs[i] = noonAlt > band[2] ? :full : null;
         }
     }
     return segs;

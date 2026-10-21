@@ -21,13 +21,34 @@ var TOPICS as Lang.Array<Lang.Array> = [
     [ "Golden Hour", GOLDEN_HOUR_AM, GOLDEN_HOUR_PM, "Golden", "Golden" ]
 ];
 
+// Application.Properties needs API 2.4. Older devices (none of them has a
+// glance) go through the app instance AB instead, like getPropertyDef();
+// a missing symbol is not an exception, so this must be a `has` check.
+(:glance)
+function readProperty(key) {
+    if (App has :Properties) {
+        return App.Properties.getValue(key);
+    }
+    return AB != null ? AB.getProperty(key) : null;
+}
+
+function writeProperty(key, value) {
+    if (App has :Properties) {
+        App.Properties.setValue(key, value);
+        return;
+    }
+    if (AB != null) {
+        AB.setProperty(key, value);
+    }
+}
+
 // Read a property with a fallback. Safe in the glance process (no Rez/AB
 // access) and in unit tests (no app instance) because it goes straight to
-// Application.Properties and swallows any lookup failure.
+// the properties and swallows any lookup failure.
 (:glance)
 function getConfig(key, def) {
     try {
-        var v = App.Properties.getValue(key);
+        var v = readProperty(key);
         if (v != null) {
             return v;
         }
@@ -56,8 +77,8 @@ function topicFor(key, def) {
 // default so an unset value is distinguishable from a real fix.
 function saveLoc(loc as Lang.Array) {
     try {
-        App.Properties.setValue("lastLat", loc[0]);
-        App.Properties.setValue("lastLng", loc[1]);
+        writeProperty("lastLat", loc[0]);
+        writeProperty("lastLng", loc[1]);
     } catch (e) {
     }
 }
@@ -66,8 +87,8 @@ function saveLoc(loc as Lang.Array) {
 (:glance)
 function loadStoredLoc() {
     try {
-        var lat = App.Properties.getValue("lastLat");
-        var lng = App.Properties.getValue("lastLng");
+        var lat = readProperty("lastLat");
+        var lng = readProperty("lastLng");
         // valid latitude in radians is within +/- pi/2; the sentinel is 999
         if (lat != null && lng != null && lat >= -2.0 && lat <= 2.0) {
             return [lat, lng];
