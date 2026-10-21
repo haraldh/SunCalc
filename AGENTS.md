@@ -173,7 +173,11 @@ a release.
    `AppVersion` in `resources/strings/strings.xml`.
 2. Build the store package locally with the real key: `nix develop -c
    make package` (the CI artifact is signed with a throwaway key and may
-   lack the newest devices).
+   lack the newest devices). SunCalc is signed with its own key,
+   `~/.id_rsa_garmin.der_suncalc`, not the default `~/.id_rsa_garmin.der`
+   (that one is gimporter's): set `PRIVATE_KEY` in `properties.local.mk`.
+   The store rejects a package signed with any other key ("Signature
+   check has failed").
 3. Upload `bin/SunCalc.iq` in the Connect IQ developer dashboard
    (https://apps.garmin.com/developer/dashboard).
 4. Store versions are named "V<major>" (V14 was the last before
