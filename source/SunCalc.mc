@@ -40,8 +40,10 @@ class SunCalc {
         lastLng = null;
     }
 
+    // Moment needs a Number: the simulator keeps a Float as is and then
+    // loses seconds at epoch magnitudes (issue #6).
     function fromJulian(j) {
-        return new Time.Moment((j + 0.5 - J1970) * DAYS);
+        return new Time.Moment(((j + 0.5 - J1970) * DAYS).toNumber());
     }
 
     function round(a) {
@@ -52,10 +54,12 @@ class SunCalc {
         }
     }
 
-    // lat and lng in radians
-    function calculate(moment, pos as Lang.Array<Lang.Double>, what) {
-        var lat = pos[0];
-        var lng = pos[1];
+    // lat and lng in radians. Floats are widened to Doubles: in single
+    // precision the Julian dates (~2.46e6) only resolve 0.25 days, and every
+    // event collapsed onto the same 6-hour step (issue #7).
+    function calculate(moment, pos as Lang.Array<Lang.Numeric>, what) {
+        var lat = pos[0].toDouble();
+        var lng = pos[1].toDouble();
 
         var d = moment.value().toDouble() / DAYS - 0.5 + J1970 - J2000;
         if (lastD != d || lastLng != lng) {

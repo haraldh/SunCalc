@@ -158,7 +158,34 @@ function testReferenceFixtures(logger) {
         [ 1782059704, -54.8019d, -68.303d, SUNSET, 1782072824 ], // ushuaia 2026-06-21
         [ 1782059704, -54.8019d, -68.303d, DUSK, 1782075391 ], // ushuaia 2026-06-21
         [ 1782059704, -54.8019d, -68.303d, NAUTIC_DUSK, 1782078235 ], // ushuaia 2026-06-21
-        [ 1782059704, -54.8019d, -68.303d, ASTRO_DUSK, 1782080889 ] // ushuaia 2026-06-21
+        [ 1782059704, -54.8019d, -68.303d, ASTRO_DUSK, 1782080889 ], // ushuaia 2026-06-21
+        [ 1774618154, 64.371607d, -20.975488d, ASTRO_DAWN, 1774583456 ], // iceland 2026-03-27 (issue #4)
+        [ 1774618154, 64.371607d, -20.975488d, NAUTIC_DAWN, 1774588031 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, DAWN, 1774591760 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, SUNRISE, 1774594706 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, NOON, 1774618154 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, SUNSET, 1774641602 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, DUSK, 1774644547 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, NAUTIC_DUSK, 1774648277 ], // iceland 2026-03-27
+        [ 1774618154, 64.371607d, -20.975488d, ASTRO_DUSK, 1774652852 ], // iceland 2026-03-27
+        [ 1782048344, 64.371607d, -20.975488d, ASTRO_DAWN, null ], // iceland 2026-06-21 (sun stays above -6 deg)
+        [ 1782048344, 64.371607d, -20.975488d, NAUTIC_DAWN, null ], // iceland 2026-06-21
+        [ 1782048344, 64.371607d, -20.975488d, DAWN, null ], // iceland 2026-06-21
+        [ 1782048344, 64.371607d, -20.975488d, SUNRISE, 1782009900 ], // iceland 2026-06-21
+        [ 1782048344, 64.371607d, -20.975488d, NOON, 1782048344 ], // iceland 2026-06-21
+        [ 1782048344, 64.371607d, -20.975488d, SUNSET, 1782086788 ], // iceland 2026-06-21 (after midnight UTC)
+        [ 1782048344, 64.371607d, -20.975488d, DUSK, null ], // iceland 2026-06-21
+        [ 1782048344, 64.371607d, -20.975488d, NAUTIC_DUSK, null ], // iceland 2026-06-21
+        [ 1782048344, 64.371607d, -20.975488d, ASTRO_DUSK, null ], // iceland 2026-06-21
+        [ 1797859319, 64.371607d, -20.975488d, ASTRO_DAWN, 1797839441 ], // iceland 2026-12-21 (winter)
+        [ 1797859319, 64.371607d, -20.975488d, NAUTIC_DAWN, 1797843075 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, DAWN, 1797847273 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, SUNRISE, 1797852119 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, NOON, 1797859319 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, SUNSET, 1797866520 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, DUSK, 1797871366 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, NAUTIC_DUSK, 1797875564 ], // iceland 2026-12-21
+        [ 1797859319, 64.371607d, -20.975488d, ASTRO_DUSK, 1797879197 ] // iceland 2026-12-21
     ] as Lang.Array<Lang.Array>;
 
     var sc = new SunCalc();
@@ -179,6 +206,77 @@ function testReferenceFixtures(logger) {
         }
     }
     return ok;
+}
+
+// Issues #7 and #4: a position given as Floats (the saved-position
+// fallback stores lastLat/lastLng as float properties, and callers of the
+// library pass plain Floats) must give the same times as Doubles. With
+// Floats the Julian dates (~2.46e6) lost everything below 0.25 days, so
+// every event collapsed onto the same 6-hour step.
+(:test)
+function testFloatPositionMatchesDouble(logger) {
+    var places = [
+        [ 1774005625, 48.101d, 11.7598d ], // munich 2026-03-20
+        [ 1774618154, 64.371607d, -20.975488d ], // iceland 2026-03-27
+        [ 1774027275, -0.1807d, -78.4678d ] // quito 2026-03-20
+    ] as Lang.Array<Lang.Array>;
+    var ok = true;
+    for (var p = 0; p < places.size(); p++) {
+        var dbl = SunCalcTestHelpers.locOf(places[p][1], places[p][2]);
+        var flt = [ dbl[0].toFloat(), dbl[1].toFloat() ];
+        var anchor = new Time.Moment(places[p][0]);
+        var prev = null;
+        for (var what = ASTRO_DAWN; what <= ASTRO_DUSK; what++) {
+            if (what == GOLDEN_HOUR_PM || what == GOLDEN_HOUR_AM) {
+                continue;
+            }
+            var expected = new SunCalc().calculate(anchor, dbl, what);
+            var got = new SunCalc().calculate(anchor, flt, what);
+            if (!SunCalcTestHelpers.near(logger, "place " + p + " event " + what,
+                                         got, expected.value().toLong())) {
+                ok = false;
+            } else if (prev != null && got.value() <= prev) {
+                logger.debug("place " + p + " event " + what + " not after the previous one");
+                ok = false;
+            }
+            if (got != null) {
+                prev = got.value();
+            }
+        }
+    }
+    return ok;
+}
+
+// Issue #6: Time.Moment must be built from a Number. The simulator keeps a
+// Float otherwise and loses seconds at epoch magnitudes.
+(:test)
+function testFromJulianIsNumber(logger) {
+    var sc = new SunCalc();
+    var m = sc.fromJulian(2461120.0123d);
+    if (!(m.value() instanceof Lang.Number)) {
+        logger.debug("fromJulian value is not a Number: " + m.value());
+        return false;
+    }
+    // 2461120.0123 JD = 2026-03-20 12:17:42 UTC
+    return SunCalcTestHelpers.near(logger, "fromJulian", m, 1774009062);
+}
+
+// The glance falls back to the saved position, which round-trips through
+// float properties: its times must match the live fix.
+(:test)
+function testStoredLocationTimes(logger) {
+    var loc = SunCalcTestHelpers.locOf(64.371607d, -20.975488d);
+    saveLoc(loc);
+    var stored = loadStoredLoc();
+    if (stored == null) {
+        logger.debug("stored location not loaded");
+        return false;
+    }
+    var anchor = new Time.Moment(1774618154);
+    return SunCalcTestHelpers.near(logger, "stored sunrise",
+                                   new SunCalc().calculate(anchor, stored, SUNRISE), 1774594706)
+        && SunCalcTestHelpers.near(logger, "stored sunset",
+                                   new SunCalc().calculate(anchor, stored, SUNSET), 1774641602);
 }
 
 // Regression for the TIMES[-1] crash: on the last day before astronomical
